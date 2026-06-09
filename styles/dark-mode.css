@@ -1,0 +1,563 @@
+/* ============================================================
+   SNH48 Live Enhancer - Dark Mode v5（基于实际站点类名）
+   类名来源：live.48.cn 站点实际 CSS 文件
+   ============================================================ */
+
+/* CSS 变量 */
+html.snh48-dark {
+  --snh48-bg: #0d0d18;           /* 页面底色 */
+  --snh48-bg-soft: #14142a;      /* 次内容区底色 */
+  --snh48-bg-content: #18182e;   /* 主内容区 */
+  --snh48-bg-card: #1a1a2e;      /* 卡片/组件 */
+  --snh48-bg-elevated: #22223a; /* 抬升元素 */
+  --snh48-bg-input: #2a2a45;     /* 输入框 */
+  --snh48-border: #2a2a40;       /* 边框 */
+  --snh48-border-soft: #33334d;
+  --snh48-text: #e0e0e8;         /* 主文字 */
+  --snh48-text-dim: #9090a8;     /* 次级文字 */
+  --snh48-text-mute: #606078;    /* 次级文字 */
+  --snh48-primary: #839cff;      /* 主题色 */
+  --snh48-primary-soft: rgba(131, 156, 255, 0.18);
+  --snh48-primary-border: rgba(131, 156, 255, 0.4);
+  --snh48-danger: #e74c3c;
+  --snh48-success: #2ecc71;
+  --snh48-warn: #f1c40f;
+}
+
+/* ---- 1. 根元素 ---- */
+html.snh48-dark,
+html.snh48-dark body {
+  background: var(--snh48-bg) !important;
+  background-color: var(--snh48-bg) !important;
+  color: var(--snh48-text) !important;
+}
+
+/* ---- 2. 主页面容器（列表/首页的 #pagelist 是 white）---- */
+html.snh48-dark #pagelist {
+  background: var(--snh48-bg-content) !important;
+  background-color: var(--snh48-bg-content) !important;
+  color: var(--snh48-text) !important;
+}
+
+/* ---- 3. 头部 (.head / .headleft / .headright) ---- */
+html.snh48-dark .head {
+  background: var(--snh48-bg-card) !important;
+  background-color: var(--snh48-bg-card) !important;
+  color: var(--snh48-text) !important;
+  border-bottom-color: var(--snh48-border) !important;
+}
+
+html.snh48-dark .head a,
+html.snh48-dark .headleft,
+html.snh48-dark .headright {
+  color: var(--snh48-text) !important;
+}
+
+html.snh48-dark .headimg {
+  background: var(--snh48-bg-input) !important;
+  border-color: var(--snh48-border) !important;
+}
+
+/* ---- 4. 主内容区 (.content / .leftcontent / .rightcontent / .middle) ---- */
+html.snh48-dark .content,
+html.snh48-dark .leftcontent,
+html.snh48-dark .rightcontent,
+html.snh48-dark .middle,
+html.snh48-dark .contentleft,
+html.snh48-dark .contentbox {
+  background: var(--snh48-bg-content) !important;
+  background-color: var(--snh48-bg-content) !important;
+  color: var(--snh48-text) !important;
+}
+
+/* ---- 5. 公演信息/成员卡片容器 ---- */
+html.snh48-dark .watchcontent {
+  background: var(--snh48-bg-content) !important;
+  background-color: var(--snh48-bg-content) !important;
+}
+
+html.snh48-dark .imglistbox {
+  background: var(--snh48-bg-card) !important;
+  background-color: var(--snh48-bg-card) !important;
+  color: var(--snh48-text) !important;
+}
+
+html.snh48-dark .imglist,
+html.snh48-dark .memberlist,
+html.snh48-dark .imgbox {
+  background: var(--snh48-bg-card) !important;
+  background-color: var(--snh48-bg-card) !important;
+  color: var(--snh48-text) !important;
+}
+
+html.snh48-dark .imgbox .name,
+html.snh48-dark .v-text p,
+html.snh48-dark .videos p {
+  color: var(--snh48-text-dim) !important;
+}
+
+html.snh48-dark .videos h4,
+html.snh48-dark .v-text h2,
+html.snh48-dark .lefttitle,
+html.snh48-dark .title1 {
+  color: var(--snh48-text) !important;
+}
+
+html.snh48-dark .title2 {
+  color: var(--snh48-text-dim) !important;
+}
+
+/* ---- 6. 右侧公演信息内容区 (.contenttype) ---- */
+html.snh48-dark .contenttype,
+html.snh48-dark .contenttype1,
+html.snh48-dark .contenttype2 {
+  background: var(--snh48-bg-card) !important;
+  background-color: var(--snh48-bg-card) !important;
+  color: var(--snh48-text) !important;
+  border-color: var(--snh48-border) !important;
+}
+
+html.snh48-dark .contype1,
+html.snh48-dark .contype2 {
+  background-color: var(--snh48-bg-elevated) !important;
+  color: var(--snh48-text-dim) !important;
+}
+
+html.snh48-dark .contentright,
+html.snh48-dark .contentrightvip,
+html.snh48-dark .contentrightlist {
+  background: var(--snh48-bg-card) !important;
+  background-color: var(--snh48-bg-card) !important;
+  color: var(--snh48-text) !important;
+}
+
+html.snh48-dark .contentright li,
+html.snh48-dark .contentrightvip li,
+html.snh48-dark .contentrightlist li {
+  color: var(--snh48-text) !important;
+}
+
+html.snh48-dark .crl-time,
+html.snh48-dark .crl-name,
+html.snh48-dark .msgname,
+html.snh48-dark .vipname,
+html.snh48-dark .crl-content {
+  color: var(--snh48-text-dim) !important;
+}
+
+/* ---- 7. 弹幕/输入框/按钮（播放器右侧）---- */
+html.snh48-dark .sendbarrage,
+html.snh48-dark .sendbarrage_no,
+html.snh48-dark .plasesignin,
+html.snh48-dark .plasesignin_no,
+html.snh48-dark .playback,
+html.snh48-dark .sub-button {
+  background: var(--snh48-bg-elevated) !important;
+  background-color: var(--snh48-bg-elevated) !important;
+  color: var(--snh48-text) !important;
+  border-color: var(--snh48-border) !important;
+}
+
+html.snh48-dark .closebarrage {
+  background: var(--snh48-bg-card) !important;
+  background-color: var(--snh48-bg-card) !important;
+  border-color: var(--snh48-border) !important;
+}
+
+html.snh48-dark .closebarragebtn {
+  background: var(--snh48-text-mute) !important;
+}
+
+html.snh48-dark .emoticonlist {
+  background-color: var(--snh48-bg-elevated) !important;
+  color: var(--snh48-text) !important;
+}
+
+html.snh48-dark .sendbarragebtn {
+  background: var(--snh48-primary) !important;
+  background-color: var(--snh48-primary) !important;
+  color: #fff !important;
+}
+
+html.snh48-dark .signbtn {
+  color: var(--snh48-primary) !important;
+}
+
+html.snh48-dark .barrages-three,
+html.snh48-dark #barrage {
+  border-color: var(--snh48-border) !important;
+  color: var(--snh48-text) !important;
+}
+
+html.snh48-dark .textlimit {
+  color: var(--snh48-text-dim) !important;
+}
+
+html.snh48-dark .crl-report,
+html.snh48-dark .crl-subtime {
+  background: var(--snh48-text-mute) !important;
+  color: #fff !important;
+}
+
+/* ---- 8. 通用按钮 / 输入框 ---- */
+html.snh48-dark .startbtn,
+html.snh48-dark .startbtn1 {
+  color: #fff !important;
+}
+
+html.snh48-dark .beginning {
+  background: var(--snh48-primary) !important;
+  background-color: var(--snh48-primary) !important;
+}
+
+html.snh48-dark .soonstart {
+  background: var(--snh48-text-mute) !important;
+  background-color: var(--snh48-text-mute) !important;
+}
+
+html.snh48-dark .listbtn {
+  color: var(--snh48-primary) !important;
+}
+
+html.snh48-dark input[type=text],
+html.snh48-dark input[type=password],
+html.snh48-dark input[type=search],
+html.snh48-dark input[type=email],
+html.snh48-dark input:not([type]),
+html.snh48-dark textarea,
+html.snh48-dark select,
+html.snh48-dark .siginput input,
+html.snh48-dark .reginput input,
+html.snh48-dark .input_long {
+  background: var(--snh48-bg-input) !important;
+  background-color: var(--snh48-bg-input) !important;
+  color: var(--snh48-text) !important;
+  border-color: var(--snh48-border) !important;
+}
+
+html.snh48-dark button,
+html.snh48-dark .btn,
+html.snh48-dark .sigbtn,
+html.snh48-dark .at_submit,
+html.snh48-dark .at_cancel,
+html.snh48-dark .mit_apply {
+  color: var(--snh48-text) !important;
+}
+
+/* ---- 9. 登录/弹框 ---- */
+html.snh48-dark .signbox {
+  background-color: var(--snh48-bg-card) !important;
+  color: var(--snh48-text) !important;
+}
+
+html.snh48-dark .sigtext,
+html.snh48-dark .regtext {
+  color: var(--snh48-text-dim) !important;
+  border-color: var(--snh48-border) !important;
+}
+
+html.snh48-dark .active {
+  border-color: var(--snh48-primary) !important;
+  color: var(--snh48-primary) !important;
+}
+
+html.snh48-dark .codes_sweep p,
+html.snh48-dark .codes_sweep p span {
+  color: var(--snh48-text-dim) !important;
+}
+
+/* ---- 10. 通用文本颜色（所有继承 body 的文本）---- */
+html.snh48-dark p,
+html.snh48-dark span,
+html.snh48-dark li,
+html.snh48-dark label,
+html.snh48-dark td,
+html.snh48-dark th,
+html.snh48-dark dt,
+html.snh48-dark dd {
+  /* 只有默认黑/深灰文字的元素需要覆盖，避免误伤彩色链接 */
+  color: inherit;
+}
+
+/* ---- 11. 链接文字 ---- */
+html.snh48-dark a {
+  color: var(--snh48-primary) !important;
+}
+
+html.snh48-dark a:hover {
+  color: #aabbff !important;
+}
+
+/* ---- 12. 视频播放器容器（保持黑色）---- */
+html.snh48-dark .videoplay,
+html.snh48-dark .xt-player,
+html.snh48-dark .video-play {
+  background: #000 !important;
+  background-color: #000 !important;
+}
+
+/* ---- 13. 表格 ---- */
+html.snh48-dark .at_list,
+html.snh48-dark .at_list th,
+html.snh48-dark .at_list td {
+  color: var(--snh48-text) !important;
+}
+
+html.snh48-dark .at_list th {
+  color: var(--snh48-text-dim) !important;
+}
+
+/* ---- 14. 通知/弹框/提交按钮颜色 ---- */
+html.snh48-dark .at_submit,
+html.snh48-dark .at_cancel,
+html.snh48-dark .mit_apply {
+  background: var(--snh48-primary) !important;
+  color: #fff !important;
+}
+
+html.snh48-dark .at_cancel {
+  background: var(--snh48-text-mute) !important;
+}
+
+/* ---- 15. 页码/分页（列表页常见）---- */
+html.snh48-dark .page,
+html.snh48-dark .pagebox,
+html.snh48-dark .pager,
+html.snh48-dark .pagelist {
+  background: var(--snh48-bg-card) !important;
+  color: var(--snh48-text) !important;
+  border-color: var(--snh48-border) !important;
+}
+
+/* ---- 16. 即将开始/即将公演小卡片 ---- */
+html.snh48-dark .starting,
+html.snh48-dark .starts,
+html.snh48-dark .startlists,
+html.snh48-dark .timetitle {
+  background: var(--snh48-bg-card) !important;
+  background-color: var(--snh48-bg-card) !important;
+  color: var(--snh48-text) !important;
+}
+
+html.snh48-dark .starttime {
+  background: var(--snh48-primary) !important;
+  color: #fff !important;
+}
+
+/* ---- 17. 内联属性 style 中带白/浅灰色背景的兜底覆盖
+   （解决 JS 动态设置 style 的场景）---- */
+html.snh48-dark [style*="background-color: white" i],
+html.snh48-dark [style*="background-color:white" i],
+html.snh48-dark [style*="background-color: #fff" i],
+html.snh48-dark [style*="background-color:#fff" i],
+html.snh48-dark [style*="background-color: #ffffff" i],
+html.snh48-dark [style*="background-color:#ffffff" i],
+html.snh48-dark [style*="background-color: #f9f9f9" i],
+html.snh48-dark [style*="background-color: #fafafa" i],
+html.snh48-dark [style*="background-color: #f5f5f5" i],
+html.snh48-dark [style*="background-color: #f8f8f8" i],
+html.snh48-dark [style*="background-color: #eeeeee" i],
+html.snh48-dark [style*="background-color: #eaeaea" i],
+html.snh48-dark [style*="background-color: #e0e0e0" i],
+html.snh48-dark [style*="background-color: #ddd" i],
+html.snh48-dark [style*="background-color: rgb(255, 255, 255)" i],
+html.snh48-dark [style*="background-color:rgb(255,255,255)" i] {
+  background-color: var(--snh48-bg-card) !important;
+  background: var(--snh48-bg-card) !important;
+}
+
+html.snh48-dark [style*="background: white" i],
+html.snh48-dark [style*="background:white" i],
+html.snh48-dark [style*="background: #fff" i],
+html.snh48-dark [style*="background:#fff" i],
+html.snh48-dark [style*="background: #ffffff" i],
+html.snh48-dark [style*="background:#ffffff" i],
+html.snh48-dark [style*="background: rgb(255, 255, 255)" i],
+html.snh48-dark [style*="background:rgb(255,255,255)" i] {
+  background-color: var(--snh48-bg-card) !important;
+  background: var(--snh48-bg-card) !important;
+}
+
+/* 内联属性黑字/深灰字 → 改亮色 */
+html.snh48-dark [style*="color: black" i],
+html.snh48-dark [style*="color:black" i],
+html.snh48-dark [style*="color: #000" i],
+html.snh48-dark [style*="color:#000" i],
+html.snh48-dark [style*="color: #000000" i],
+html.snh48-dark [style*="color:#000000" i],
+html.snh48-dark [style*="color: #333" i],
+html.snh48-dark [style*="color:#333" i],
+html.snh48-dark [style*="color: #333333" i],
+html.snh48-dark [style*="color:#333333" i],
+html.snh48-dark [style*="color: #222" i],
+html.snh48-dark [style*="color:#222" i],
+html.snh48-dark [style*="color: #444" i],
+html.snh48-dark [style*="color:#444" i],
+html.snh48-dark [style*="color: #555" i],
+html.snh48-dark [style*="color:#555" i],
+html.snh48-dark [style*="color: rgb(0, 0, 0)" i],
+html.snh48-dark [style*="color:rgb(0,0,0)" i] {
+  color: var(--snh48-text) !important;
+}
+
+html.snh48-dark [style*="color: #666" i],
+html.snh48-dark [style*="color:#666" i],
+html.snh48-dark [style*="color: #666666" i],
+html.snh48-dark [style*="color:#666666" i],
+html.snh48-dark [style*="color: #777" i],
+html.snh48-dark [style*="color:#777" i],
+html.snh48-dark [style*="color: #888" i],
+html.snh48-dark [style*="color:#888" i] {
+  color: var(--snh48-text-dim) !important;
+}
+
+/* ---- 18. 滚动条 ---- */
+html.snh48-dark ::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+html.snh48-dark ::-webkit-scrollbar-track {
+  background: var(--snh48-bg-content);
+}
+
+html.snh48-dark ::-webkit-scrollbar-thumb {
+  background: var(--snh48-border);
+  border-radius: 5px;
+}
+
+html.snh48-dark ::-webkit-scrollbar-thumb:hover {
+  background: var(--snh48-primary);
+}
+
+/* ---- 19. 选中高亮 ---- */
+html.snh48-dark ::selection {
+  background: var(--snh48-primary);
+  color: white;
+}
+
+/* ---- 20. 特殊：保留视频/图像/播放器原本的深色外观（不误伤）---- */
+html.snh48-dark video,
+html.snh48-dark img,
+html.snh48-dark svg,
+html.snh48-dark canvas,
+html.snh48-dark picture {
+  filter: none !important;
+}
+
+/* ---- 21. 提示文本 ---- */
+html.snh48-dark .at_notice,
+html.snh48-dark .at_log_left,
+html.snh48-dark .at_log_right,
+html.snh48-dark .apply_notice {
+  color: var(--snh48-text-dim) !important;
+}
+
+html.snh48-dark .req,
+html.snh48-dark .red,
+html.snh48-dark .sred {
+  color: var(--snh48-danger) !important;
+}
+
+html.snh48-dark .s_c {
+  color: #839cff !important;
+}
+
+html.snh48-dark .b_c {
+  color: #ff7aa0 !important;
+}
+
+html.snh48-dark .g_c {
+  color: #aacc55 !important;
+}
+
+/* ---- 22. 公演贡献榜（成员贡献排行）---- */
+html.snh48-dark .sicence,
+html.snh48-dark .sicencebox,
+html.snh48-dark .siceranking,
+html.snh48-dark .pierce,
+html.snh48-dark .sicence_rank,
+html.snh48-dark .sicence_list,
+html.snh48-dark .sicence_item {
+  background: var(--snh48-bg-card) !important;
+  background-color: var(--snh48-bg-card) !important;
+  color: var(--snh48-text) !important;
+  border-color: var(--snh48-border) !important;
+}
+
+html.snh48-dark .sicence_title,
+html.snh48-dark .sicencebox_title,
+html.snh48-dark .siceranking_title {
+  color: var(--snh48-text) !important;
+  background: var(--snh48-bg-elevated) !important;
+  background-color: var(--snh48-bg-elevated) !important;
+  border-color: var(--snh48-border) !important;
+}
+
+html.snh48-dark .sicence_rank_num,
+html.snh48-dark .sicence_no1,
+html.snh48-dark .sicence_no2,
+html.snh48-dark .sicence_no3 {
+  background: var(--snh48-primary) !important;
+  background-color: var(--snh48-primary) !important;
+  color: #fff !important;
+}
+
+html.snh48-dark .sicence_name,
+html.snh48-dark .sicence_member,
+html.snh48-dark .pierce_name {
+  color: var(--snh48-text) !important;
+}
+
+html.snh48-dark .sicence_value,
+html.snh48-dark .sicence_count,
+html.snh48-dark .sicence_score,
+html.snh48-dark .pierce_value {
+  color: var(--snh48-primary) !important;
+}
+
+html.snh48-dark .sicence li,
+html.snh48-dark .siceranking li,
+html.snh48-dark .pierce li {
+  border-bottom-color: var(--snh48-border) !important;
+  background: transparent !important;
+  background-color: transparent !important;
+}
+
+/* ---- 23. 隐藏头部模式（暗黑/亮色模式都生效）---- */
+body.snh48-hide-header .head {
+  display: none !important;
+}
+
+/* ---- 24. 快捷导航栏（暗黑模式下保持原样，不受全局覆盖影响）---- */
+html.snh48-dark .snh48-quick-nav {
+  background: rgba(20, 20, 40, 0.98) !important;
+  background-color: rgba(20, 20, 40, 0.98) !important;
+  border: 1px solid rgba(131, 156, 255, 0.35) !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5) !important;
+  backdrop-filter: blur(3px) !important;
+  -webkit-backdrop-filter: blur(3px) !important;
+}
+
+html.snh48-dark .snh48-nav-item {
+  color: #e0e0e8 !important;
+  background: transparent !important;
+  background-color: transparent !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6) !important;
+  font-weight: 500 !important;
+  text-decoration: none !important;
+}
+
+html.snh48-dark .snh48-nav-item:hover {
+  color: #c0c8ff !important;
+  background: rgba(131, 156, 255, 0.25) !important;
+  background-color: rgba(131, 156, 255, 0.25) !important;
+}
+
+html.snh48-dark .snh48-nav-item.active {
+  color: #ffffff !important;
+  background: #839cff !important;
+  background-color: #839cff !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4) !important;
+  font-weight: 600 !important;
+}

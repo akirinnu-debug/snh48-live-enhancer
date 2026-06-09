@@ -1,0 +1,22 @@
+# 构建脚本
+build-release.ps1
+
+# 打包产物与校验文件
+*.zip
+*.sha256
+
+# 旧版本发布目录
+release/
+release-v*/
+
+# 开发期文档与日志
+docs/
+
+# 源素材（PNG 图标已在 icons/ 中提供）
+icons/icon.svg
+
+# 系统 / 编辑器
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

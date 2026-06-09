@@ -1,0 +1,1037 @@
+/* ========== SNH48 Live Enhancer - UI Enhancement v2 ========== */
+
+/* ===========================================
+   1. 嵌入网页顶部的搜索入口
+   =========================================== */
+.snh48-embedded-search {
+  display: inline-flex;
+  align-items: center;
+  position: relative;
+  margin-right: 15px;
+  vertical-align: middle;
+  z-index: 100;
+}
+
+.snh48-search-input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.snh48-embedded-search-input {
+  width: 240px;
+  height: 30px;
+  padding: 0 60px 0 12px;
+  border: 1px solid rgba(131, 156, 255, 0.3);
+  border-radius: 15px;
+  background: rgba(131, 156, 255, 0.08);
+  color: inherit;
+  font-size: 13px;
+  outline: none;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.snh48-embedded-search-input::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.snh48-embedded-search-input:focus {
+  width: 320px;
+  background: rgba(131, 156, 255, 0.15);
+  border-color: #839cff;
+  box-shadow: 0 0 0 3px rgba(131, 156, 255, 0.1);
+}
+
+.snh48-search-shortcut {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(131, 156, 255, 0.15);
+  color: #839cff;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-family: monospace;
+  pointer-events: none;
+  border: 1px solid rgba(131, 156, 255, 0.3);
+}
+
+.snh48-embedded-search-input:focus + .snh48-search-shortcut {
+  opacity: 0.3;
+}
+
+.snh48-search-results {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  min-width: 380px;
+  max-width: 480px;
+  max-height: 520px;
+  overflow-y: auto;
+  background: rgba(20, 20, 40, 0.98);
+  border: 1px solid rgba(131, 156, 255, 0.4);
+  border-radius: 10px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(10px);
+  display: none;
+  z-index: 9999;
+  padding: 4px 0;
+}
+
+.snh48-search-results.active {
+  display: block;
+}
+
+.snh48-search-results::-webkit-scrollbar {
+  width: 6px;
+}
+
+.snh48-search-results::-webkit-scrollbar-thumb {
+  background: rgba(131, 156, 255, 0.3);
+  border-radius: 3px;
+}
+
+/* 类型过滤 chips */
+.snh48-search-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 6px 10px 8px 10px;
+  border-bottom: 1px solid rgba(131, 156, 255, 0.15);
+  position: sticky;
+  top: 0;
+  background: rgba(20, 20, 40, 0.95);
+  backdrop-filter: blur(10px);
+  z-index: 1;
+}
+
+.snh48-search-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 3px 8px;
+  background: rgba(131, 156, 255, 0.08);
+  border: 1px solid rgba(131, 156, 255, 0.2);
+  border-radius: 12px;
+  color: #aaa;
+  font-size: 11px;
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+
+.snh48-search-chip:hover {
+  background: rgba(131, 156, 255, 0.18);
+  color: #e0e0e0;
+}
+
+.snh48-search-chip.active {
+  background: #839cff;
+  color: white;
+  border-color: #839cff;
+}
+
+.snh48-search-chip em {
+  font-style: normal;
+  background: rgba(0, 0, 0, 0.2);
+  padding: 0 5px;
+  border-radius: 8px;
+  font-size: 10px;
+  font-weight: bold;
+  min-width: 16px;
+  text-align: center;
+}
+
+.snh48-search-chip.active em {
+  background: rgba(255, 255, 255, 0.25);
+  color: white;
+}
+
+/* 分组 */
+.snh48-search-group {
+  padding: 4px 0 6px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.snh48-search-group:last-child {
+  border-bottom: none;
+}
+
+.snh48-search-group-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px 4px 12px;
+  font-size: 10px;
+  color: #839cff;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 600;
+}
+
+.snh48-search-group-icon {
+  font-size: 12px;
+}
+
+.snh48-search-group-label {
+  flex: 1;
+}
+
+.snh48-search-group-count {
+  background: rgba(131, 156, 255, 0.2);
+  color: #839cff;
+  padding: 1px 6px;
+  border-radius: 8px;
+  font-size: 9px;
+  font-weight: bold;
+}
+
+/* 单条结果 */
+.snh48-search-result-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 12px;
+  cursor: pointer;
+  color: #e0e0e0;
+  font-size: 12px;
+  transition: background 0.12s;
+  position: relative;
+}
+
+.snh48-search-result-item:hover,
+.snh48-search-result-item.active {
+  background: rgba(131, 156, 255, 0.18);
+}
+
+.snh48-search-result-item.active {
+  border-left: 2px solid #839cff;
+  padding-left: 10px;
+}
+
+.snh48-search-type {
+  flex-shrink: 0;
+  background: rgba(131, 156, 255, 0.18);
+  color: #839cff;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-size: 9px;
+  min-width: 50px;
+  text-align: center;
+  font-weight: 600;
+}
+
+.snh48-search-type.snh48-type-member-perf {
+  background: rgba(155, 89, 182, 0.25) !important;
+  color: #be7ddc !important;
+}
+
+.snh48-search-name {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: 500;
+}
+
+.snh48-search-name b {
+  color: #839cff;
+  background: rgba(131, 156, 255, 0.2);
+  padding: 0 2px;
+  border-radius: 2px;
+  font-weight: bold;
+}
+
+.snh48-search-meta {
+  flex-shrink: 0;
+  color: #888;
+  font-size: 10px;
+  max-width: 160px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 查看更多 */
+.snh48-search-more {
+  padding: 6px 12px;
+  text-align: center;
+  color: #839cff;
+  font-size: 11px;
+  cursor: pointer;
+  background: rgba(131, 156, 255, 0.05);
+  transition: background 0.15s;
+  border-top: 1px dashed rgba(131, 156, 255, 0.15);
+}
+
+.snh48-search-more:hover {
+  background: rgba(131, 156, 255, 0.15);
+}
+
+/* 空状态 */
+.snh48-search-empty {
+  padding: 16px 14px;
+  text-align: center;
+  color: #888;
+}
+
+.snh48-search-empty-title {
+  font-size: 12px;
+  color: #aaa;
+  margin-bottom: 4px;
+}
+
+.snh48-search-empty-hint {
+  font-size: 10px;
+  color: #666;
+}
+
+/* 推荐标签 */
+.snh48-search-suggestions {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px dashed rgba(131, 156, 255, 0.15);
+  text-align: left;
+}
+
+.snh48-search-suggestions-label {
+  font-size: 10px;
+  color: #666;
+  margin-bottom: 6px;
+  text-align: center;
+}
+
+.snh48-search-suggestion-tag {
+  display: inline-block;
+  margin: 2px 4px 2px 0;
+  padding: 3px 8px;
+  background: rgba(131, 156, 255, 0.1);
+  border: 1px solid rgba(131, 156, 255, 0.25);
+  border-radius: 10px;
+  color: #839cff;
+  font-size: 11px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.snh48-search-suggestion-tag:hover {
+  background: rgba(131, 156, 255, 0.25);
+  color: #fff;
+  transform: translateY(-1px);
+}
+
+/* ===========================================
+   2. 容器内成员搜索（直播/回放页）
+   =========================================== */
+.snh48-container-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 10px 0;
+  padding: 8px 12px;
+  background: rgba(131, 156, 255, 0.08);
+  border: 1px solid rgba(131, 156, 255, 0.2);
+  border-radius: 8px;
+}
+
+.snh48-container-search-input {
+  flex: 1;
+  height: 30px;
+  padding: 0 12px;
+  border: 1px solid rgba(131, 156, 255, 0.3);
+  border-radius: 15px;
+  background: rgba(255, 255, 255, 0.05);
+  color: inherit;
+  font-size: 13px;
+  outline: none;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+
+.snh48-container-search-input:focus {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: #839cff;
+}
+
+.snh48-container-search-input::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.snh48-container-search-count {
+  flex-shrink: 0;
+  color: #839cff;
+  font-size: 11px;
+  padding: 2px 8px;
+  background: rgba(131, 156, 255, 0.1);
+  border-radius: 10px;
+}
+
+/* ===========================================
+   3. 浮动控制面板（紧凑、可拖动）
+   =========================================== */
+.snh48-float-panel {
+  position: fixed;
+  top: 80px;
+  right: 12px;
+  z-index: 99999;
+  width: 230px;
+  max-width: calc(100vw - 24px);
+  max-height: calc(100vh - 100px);
+  background: rgba(18, 20, 38, 0.96);
+  border-radius: 10px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+  color: #e0e0e0;
+  font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+  font-size: 11px;
+  overflow: hidden;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(131, 156, 255, 0.25);
+  user-select: none;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 头部：拖动条 */
+.snh48-float-panel .snh48-panel-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 8px;
+  background: rgba(131, 156, 255, 0.12);
+  border-bottom: 1px solid rgba(131, 156, 255, 0.2);
+  cursor: move;
+  font-size: 11px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.snh48-float-panel .snh48-drag-handle {
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 12px;
+  letter-spacing: -2px;
+}
+
+.snh48-float-panel .snh48-title {
+  flex: 1;
+  color: #c0c8ff;
+  font-size: 11px;
+}
+
+.snh48-float-panel .snh48-toggle {
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #c0c8ff;
+  font-size: 12px;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background 0.15s;
+}
+
+.snh48-float-panel .snh48-toggle:hover {
+  background: rgba(131, 156, 255, 0.2);
+}
+
+/* 主体：滚动条 */
+.snh48-float-panel .snh48-panel-body {
+  padding: 6px 8px 8px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  max-height: calc(100vh - 140px);
+  scrollbar-width: thin;
+  scrollbar-color: rgba(131, 156, 255, 0.3) transparent;
+}
+
+.snh48-float-panel .snh48-panel-body::-webkit-scrollbar {
+  width: 4px;
+}
+.snh48-float-panel .snh48-panel-body::-webkit-scrollbar-thumb {
+  background: rgba(131, 156, 255, 0.3);
+  border-radius: 2px;
+}
+
+/* 折叠状态：仅显示头部 */
+.snh48-float-panel.collapsed .snh48-panel-body {
+  display: none;
+}
+
+.snh48-float-panel.collapsed .snh48-panel-header {
+  cursor: move;
+  border-bottom: none;
+  background: rgba(131, 156, 255, 0.18);
+}
+
+.snh48-float-panel.collapsed {
+  width: auto;
+  min-width: 110px;
+}
+
+.snh48-float-panel.collapsed .snh48-title {
+  font-size: 11px;
+}
+
+.snh48-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: linear-gradient(135deg, #839cff 0%, #6c5ce7 100%);
+  color: white;
+  font-weight: bold;
+  font-size: 13px;
+  cursor: move;
+  user-select: none;
+}
+
+.snh48-panel-header .snh48-title {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.snh48-panel-header .snh48-toggle {
+  cursor: pointer;
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  font-size: 11px;
+  transition: background 0.2s;
+}
+
+.snh48-panel-header .snh48-toggle:hover {
+  background: rgba(255, 255, 255, 0.4);
+}
+
+.snh48-panel-body {
+  max-height: 520px;
+  overflow-y: auto;
+  padding: 4px 0;
+}
+
+.snh48-panel-body::-webkit-scrollbar {
+  width: 4px;
+}
+
+.snh48-panel-body::-webkit-scrollbar-thumb {
+  background: rgba(131, 156, 255, 0.4);
+  border-radius: 2px;
+}
+
+.snh48-section {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  padding: 5px 0;
+}
+
+.snh48-section:last-child {
+  border-bottom: none;
+  padding-bottom: 2px;
+}
+
+.snh48-section-title {
+  font-size: 10px;
+  color: #8a92b8;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+  padding-left: 2px;
+  font-weight: 600;
+}
+
+.snh48-section-title {
+  font-size: 10px;
+  color: #839cff;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin: 4px 0;
+  font-weight: 600;
+}
+
+.snh48-switch-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 2px 0;
+  min-height: 22px;
+}
+
+.snh48-switch-row label {
+  color: #ccc;
+  font-size: 11px;
+  cursor: pointer;
+  line-height: 1.2;
+}
+
+.snh48-switch {
+  position: relative;
+  width: 28px;
+  height: 16px;
+  cursor: pointer;
+  display: inline-block;
+  vertical-align: middle;
+  flex-shrink: 0;
+}
+
+.snh48-switch input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.snh48-switch .slider {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: #444;
+  border-radius: 16px;
+  transition: 0.3s;
+  cursor: pointer;
+}
+
+.snh48-switch .slider::before {
+  content: "";
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  left: 2px;
+  bottom: 2px;
+  background: white;
+  border-radius: 50%;
+  transition: 0.3s;
+}
+
+.snh48-switch input:checked + .slider {
+  background: #839cff;
+}
+
+.snh48-switch input:checked + .slider::before {
+  transform: translateX(12px);
+}
+
+/* 快捷键切换按钮 */
+.snh48-shortcut-toggle {
+  margin: 4px 0 2px;
+  padding: 4px 8px;
+  background: rgba(131, 156, 255, 0.1);
+  border: 1px solid rgba(131, 156, 255, 0.3);
+  border-radius: 5px;
+  color: #839cff;
+  font-size: 11px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.snh48-shortcut-toggle:hover {
+  background: rgba(131, 156, 255, 0.2);
+}
+
+.snh48-shortcut-list-wrap {
+  padding: 6px 0;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 6px;
+  margin-top: 4px;
+}
+
+.snh48-shortcut-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3px 8px;
+  padding: 0 8px;
+}
+
+.snh48-shortcut {
+  font-size: 10px;
+  color: #aaa;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  padding: 2px 0;
+}
+
+.snh48-shortcut kbd {
+  background: rgba(131, 156, 255, 0.15);
+  border: 1px solid rgba(131, 156, 255, 0.3);
+  border-radius: 3px;
+  padding: 0 4px;
+  font-size: 9px;
+  color: #839cff;
+  font-family: monospace;
+  min-width: 16px;
+  text-align: center;
+}
+
+.snh48-panel-footer {
+  text-align: center;
+  padding: 6px 0;
+  font-size: 10px;
+  color: #555;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  margin-top: 4px;
+}
+
+/* ===========================================
+   4. 快捷导航
+   =========================================== */
+.snh48-quick-nav {
+  position: fixed;
+  left: 50%;
+  bottom: 20px;
+  transform: translateX(-50%);
+  z-index: 99998;
+  display: flex;
+  gap: 4px;
+  background: rgba(20, 20, 40, 0.98);
+  padding: 6px 10px;
+  border-radius: 20px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+  border: 1px solid rgba(131, 156, 255, 0.35);
+  transition: opacity 0.3s, transform 0.3s;
+}
+
+.snh48-quick-nav.hidden {
+  opacity: 0;
+  transform: translateX(-50%) translateY(20px);
+  pointer-events: none;
+}
+
+.snh48-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 12px;
+  border-radius: 14px;
+  color: #e0e0e8;
+  font-size: 12px;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+  font-weight: 500;
+}
+
+.snh48-nav-item:hover {
+  background: rgba(131, 156, 255, 0.25);
+  color: #c0c8ff;
+}
+
+.snh48-nav-item.active {
+  background: #839cff;
+  color: white;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+  font-weight: 600;
+}
+
+/* ===========================================
+   5. Toast 通知
+   =========================================== */
+.snh48-toast {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-60px);
+  z-index: 999999;
+  background: rgba(20, 20, 40, 0.95);
+  color: #e0e0e0;
+  padding: 8px 20px;
+  border-radius: 8px;
+  font-size: 13px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(131, 156, 255, 0.3);
+  transition: transform 0.3s ease;
+  pointer-events: none;
+  max-width: 80%;
+  white-space: nowrap;
+}
+
+.snh48-toast.show {
+  transform: translateX(-50%) translateY(0);
+}
+
+/* ===========================================
+   6. 截图闪光
+   =========================================== */
+.snh48-screenshot-flash {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: white;
+  z-index: 999999;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.1s;
+}
+
+.snh48-screenshot-flash.active {
+  opacity: 0.4;
+}
+
+/* ===========================================
+   7. 公演提醒弹窗
+   =========================================== */
+.snh48-reminder-popup {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 999998;
+  width: 320px;
+  background: rgba(20, 20, 40, 0.98);
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(231, 76, 60, 0.5);
+  color: #e0e0e0;
+  overflow: hidden;
+  animation: snh48-slideIn 0.4s ease;
+}
+
+@keyframes snh48-slideIn {
+  from { transform: translateX(100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+.snh48-reminder-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 14px;
+  background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+  color: white;
+  font-weight: bold;
+  font-size: 13px;
+}
+
+.snh48-reminder-close {
+  cursor: pointer;
+  font-size: 18px;
+  line-height: 1;
+  opacity: 0.8;
+}
+
+.snh48-reminder-close:hover {
+  opacity: 1;
+}
+
+.snh48-reminder-body {
+  padding: 10px 14px;
+}
+
+.snh48-reminder-title {
+  font-size: 14px;
+  font-weight: bold;
+  color: #839cff;
+  margin-bottom: 4px;
+}
+
+.snh48-reminder-time {
+  font-size: 12px;
+  color: #aaa;
+}
+
+/* ===========================================
+   9. 成员-公演索引（mini 按钮 / 信息显示）
+   =========================================== */
+.snh48-member-index-info {
+  font-size: 10px;
+  color: #888;
+  padding: 3px 8px;
+  background: rgba(131, 156, 255, 0.05);
+  border-left: 2px solid #839cff;
+  border-radius: 3px;
+  margin: 4px 0;
+  line-height: 1.4;
+  font-family: monospace;
+}
+
+.snh48-member-index-actions {
+  display: flex;
+  gap: 6px;
+  margin: 4px 0 6px 0;
+}
+
+.snh48-mini-btn {
+  flex: 1;
+  height: 24px;
+  background: rgba(231, 76, 60, 0.15);
+  color: #e74c3c;
+  border: 1px solid rgba(231, 76, 60, 0.3);
+  border-radius: 4px;
+  font-size: 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+
+.snh48-mini-btn:hover {
+  background: rgba(231, 76, 60, 0.3);
+  color: #fff;
+}
+
+.snh48-mini-btn:active {
+  transform: scale(0.95);
+}
+
+/* "成员参演"搜索结果类型 - 特殊颜色突出 */
+.snh48-search-result-item .snh48-search-type.snh48-type-member-perf {
+  background: rgba(155, 89, 182, 0.25) !important;
+  color: #be7ddc !important;
+}
+
+/* ===========================================
+   8. 兼容：原始网站元素增强
+   =========================================== */
+
+/* 直播按钮脉冲效果（针对 .startbtn 中"正在直播"） */
+.snh48-highlight-live .startbtn:contains("正在直播") {
+  animation: snh48-pulse 1.5s infinite;
+}
+
+@keyframes snh48-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+/* ===========================================
+   10. 批量索引样式
+   =========================================== */
+.snh48-indexing-controls {
+  margin-top: 6px;
+}
+
+.snh48-indexing-inputs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.snh48-indexing-input-wrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.snh48-indexing-input-wrap span {
+  font-size: 11px;
+  color: #aaa;
+}
+
+.snh48-indexing-input-wrap input {
+  height: 24px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(131,156,255,0.25);
+  border-radius: 4px;
+  color: #e0e0e0;
+  padding: 0 8px;
+  font-size: 12px;
+  outline: none;
+  font-family: inherit;
+}
+
+.snh48-indexing-input-wrap input:focus {
+  border-color: #839cff;
+}
+
+.snh48-indexing-buttons {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.snh48-indexing-btn {
+  flex: 1;
+  height: 28px;
+  border: none;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+
+.snh48-indexing-start {
+  background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+  color: white;
+}
+
+.snh48-indexing-start:hover:not(:disabled) {
+  background: linear-gradient(135deg, #27ae60 0%, #1e8449 100%);
+}
+
+.snh48-indexing-start:disabled {
+  background: #555;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.snh48-indexing-stop {
+  background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+  color: white;
+}
+
+.snh48-indexing-stop:hover:not(:disabled) {
+  background: linear-gradient(135deg, #c0392b 0%, #96281b 100%);
+}
+
+.snh48-indexing-stop:disabled {
+  background: #555;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.snh48-indexing-progress {
+  margin-top: 4px;
+}
+
+.snh48-progress-bar {
+  height: 6px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-bottom: 4px;
+}
+
+.snh48-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #2ecc71 0%, #27ae60 100%);
+  width: 0%;
+  transition: width 0.2s;
+  border-radius: 3px;
+}
+
+.snh48-progress-text {
+  font-size: 10px;
+  color: #bbb;
+  font-family: monospace;
+  text-align: center;
+}
+
+.snh48-progress-detail {
+  font-size: 9px;
+  color: #888;
+  font-family: monospace;
+  text-align: center;
+  margin-top: 2px;
+  min-height: 12px;
+}
+
+.snh48-indexing-input-wrap input:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}

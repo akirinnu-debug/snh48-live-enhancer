@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>SNH48 Live Enhancer</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      width: 320px;
+      font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+      background: #0f0f1a;
+      color: #e0e0e0;
+      font-size: 13px;
+    }
+
+    .header {
+      background: linear-gradient(135deg, #839cff 0%, #6c5ce7 100%);
+      padding: 14px 16px;
+      text-align: center;
+    }
+
+    .header h1 {
+      font-size: 15px;
+      color: white;
+      margin-bottom: 3px;
+    }
+
+    .header p {
+      font-size: 11px;
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    .content {
+      padding: 10px 14px;
+    }
+
+    .section {
+      margin-bottom: 12px;
+    }
+
+    .section-title {
+      font-size: 10px;
+      color: #839cff;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 6px;
+      font-weight: 600;
+    }
+
+    .switch-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 4px 0;
+    }
+
+    .switch-row label {
+      color: #ccc;
+      font-size: 12px;
+      cursor: pointer;
+    }
+
+    .switch {
+      position: relative;
+      width: 36px;
+      height: 20px;
+      cursor: pointer;
+      display: inline-block;
+      vertical-align: middle;
+    }
+
+    .switch input {
+      position: absolute;
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .switch .slider {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: #444;
+      border-radius: 20px;
+      transition: 0.3s;
+      cursor: pointer;
+    }
+
+    .switch .slider::before {
+      content: "";
+      position: absolute;
+      width: 16px;
+      height: 16px;
+      left: 2px;
+      bottom: 2px;
+      background: white;
+      border-radius: 50%;
+      transition: 0.3s;
+    }
+
+    .switch input:checked + .slider {
+      background: #839cff;
+    }
+
+    .switch input:checked + .slider::before {
+      transform: translateX(16px);
+    }
+
+    .divider {
+      height: 1px;
+      background: rgba(255, 255, 255, 0.08);
+      margin: 8px 0;
+    }
+
+    .status-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 6px 10px;
+      background: rgba(131, 156, 255, 0.08);
+      border-radius: 6px;
+      margin-top: 8px;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #2ecc71;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    .status-text {
+      font-size: 11px;
+      color: #888;
+    }
+
+    .footer {
+      text-align: center;
+      padding: 6px;
+      font-size: 10px;
+      color: #555;
+    }
+
+    .tip {
+      font-size: 10px;
+      color: #888;
+      padding: 4px 8px;
+      background: rgba(131, 156, 255, 0.05);
+      border-left: 2px solid #839cff;
+      border-radius: 3px;
+      margin-top: 6px;
+      line-height: 1.4;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>⚙️ SNH48 Live Enhancer</h1>
+    <p>优化公演直播网站体验</p>
+  </div>
+
+  <div class="content">
+    <!-- 外观 -->
+    <div class="section">
+      <div class="section-title">外观</div>
+      <div class="switch-row">
+        <label for="darkMode">暗黑模式</label>
+        <label class="switch"><input type="checkbox" id="darkMode"><span class="slider"></span></label>
+      </div>
+      <div class="switch-row">
+        <label for="hideHeader">隐藏头部</label>
+        <label class="switch"><input type="checkbox" id="hideHeader"><span class="slider"></span></label>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- 视频 -->
+    <div class="section">
+      <div class="section-title">视频增强</div>
+      <div class="switch-row">
+        <label for="videoShortcuts">键盘快捷键</label>
+        <label class="switch"><input type="checkbox" id="videoShortcuts"><span class="slider"></span></label>
+      </div>
+      <div class="switch-row">
+        <label for="screenshotEnabled">截图功能</label>
+        <label class="switch"><input type="checkbox" id="screenshotEnabled"><span class="slider"></span></label>
+      </div>
+      <div class="tip">Space 播放 | ←/→ 进度 | F 全屏 | P 画中画 | S 截图</div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- 功能 -->
+    <div class="section">
+      <div class="section-title">功能</div>
+      <div class="switch-row">
+        <label for="embeddedSearch">顶部搜索入口</label>
+        <label class="switch"><input type="checkbox" id="embeddedSearch"><span class="slider"></span></label>
+      </div>
+      <div class="switch-row">
+        <label for="memberIndex">成员参演索引</label>
+        <label class="switch"><input type="checkbox" id="memberIndex"><span class="slider"></span></label>
+      </div>
+      <div class="switch-row">
+        <label for="quickNav">快捷导航</label>
+        <label class="switch"><input type="checkbox" id="quickNav"><span class="slider"></span></label>
+      </div>
+      <div class="switch-row">
+        <label for="reminderEnabled">公演提醒</label>
+        <label class="switch"><input type="checkbox" id="reminderEnabled"><span class="slider"></span></label>
+      </div>
+      <div class="tip">按 Ctrl+K 快速打开搜索</div>
+    </div>
+
+    <div class="status-bar">
+      <div style="display:flex;align-items:center;gap:6px;">
+        <div class="status-dot"></div>
+        <span class="status-text">插件运行中</span>
+      </div>
+      <span class="status-text">v2.0.0</span>
+    </div>
+  </div>
+
+  <div class="footer">SNH48 Live Enhancer © 2026</div>
+
+  <script src="scripts/popup.js"></script>
+</body>
+</html>
