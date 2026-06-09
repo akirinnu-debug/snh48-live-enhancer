@@ -1,9 +1,11 @@
 # 构建脚本
 build-release.ps1
 
-# 打包产物与校验文件
+# 打包产物 / CRX
 *.zip
 *.sha256
+*.crx
+*.pem
 
 # 旧版本发布目录
 release/
