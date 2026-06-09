@@ -1,17 +1,15 @@
 # 构建脚本
 build-release.ps1
 
-# 打包产物 / CRX
+# 打包产物 / CRX / 签名私钥
 *.zip
 *.sha256
 *.crx
 *.pem
 
-# 旧版本发布目录
+# 旧版本发布目录与开发期文档
 release/
 release-v*/
-
-# 开发期文档与日志
 docs/
 
 # 源素材（PNG 图标已在 icons/ 中提供）
