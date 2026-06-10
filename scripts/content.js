@@ -501,8 +501,8 @@
   // 存储于 chrome.storage.local（配额 5MB），按 LRU 淘汰
 
   var MEMBER_INDEX_KEY = "snh48_member_index";
-  var MEMBER_INDEX_MAX_ENTRIES = 5000; // 索引最多保留的 (成员, 公演) 条目
-  var MEMBER_INDEX_MAX_PER_MEMBER = 50; // 单个成员最多保留的公演数
+  var MEMBER_INDEX_MAX_ENTRIES = 50000; // [OPT] 索引最多保留的 (成员, 公演) 条目（原5000，提升10倍）
+  var MEMBER_INDEX_MAX_PER_MEMBER = 200; // [OPT] 单个成员最多保留的公演数（原50，提升4倍）
   var memberIndex = {};
   var memberIndexSaveTimer = null;
   var memberIndexStats = { members: 0, performances: 0 };
@@ -892,7 +892,8 @@
           empty.className = "snh48-search-empty";
 
           if (currentData.query) {
-            empty.innerHTML = '<div class="snh48-search-empty-title">未找到匹配 "' + escapeHtml(currentData.query) + '"</div>';
+            empty.innerHTML = '<div class="snh48-search-empty-title">未找到匹配 "' + escapeHtml(currentData.query) + '"</div>' +
+              '<div class="snh48-search-empty-hint">试试搜索公演名、成员名或团名</div>';
 
             // 推荐：成员索引中的热门成员（按 ts 倒序）
             var suggestions = getTopMemberSuggestions(5);
@@ -1032,8 +1033,18 @@
           }
         }
 
+        // [OPT] 搜索防抖：减少频繁搜索请求
+        var searchDebounceTimer = null;
         input.addEventListener("input", function () {
-          performSearch(input.value.trim());
+          var val = input.value.trim();
+          clearTimeout(searchDebounceTimer);
+          if (!val) {
+            closeResults();
+            return;
+          }
+          searchDebounceTimer = _extSetTimeout(function () {
+            performSearch(val);
+          }, 150);
         });
 
         input.addEventListener("focus", function () {
@@ -1346,20 +1357,34 @@
     }
     log("视频快捷键已启用");
 
+    // [FIX] 使用捕获阶段监听 keydown，优先于网站播放器的事件处理
+    // 网站播放器可能在冒泡阶段 stopPropagation()，导致空格键等无法到达 document
     document.addEventListener("keydown", function (e) {
       // 输入框中不触发
       var tag = e.target.tagName;
       if (tag === "INPUT" || tag === "TEXTAREA" || e.target.isContentEditable) return;
 
+      // [FIX] 更健壮地查找 video 元素：直接查找 + Shadow DOM 查找
       var video = document.querySelector("video");
+      if (!video) {
+        // 尝试在 Shadow DOM 中查找
+        var allEls = document.querySelectorAll("*");
+        for (var i = 0; i < allEls.length; i++) {
+          if (allEls[i].shadowRoot) {
+            var shadowVideo = allEls[i].shadowRoot.querySelector("video");
+            if (shadowVideo) { video = shadowVideo; break; }
+          }
+        }
+      }
       if (!video && !["F2", "F1"].includes(e.key)) return;
 
       switch (e.key) {
         case " ":
           if (video) {
             e.preventDefault();
+            e.stopPropagation(); // [FIX] 阻止事件继续传播到播放器，避免双重触发
             if (video.paused) {
-              video.play();
+              video.play().catch(function() {});
               showToast("▶ 播放");
             } else {
               video.pause();
@@ -1453,7 +1478,7 @@
           }
           break;
       }
-    });
+    }, true); // [FIX] capture: true — 在捕获阶段处理，优先于网站播放器
   }
 
   function toggleFullScreen() {
@@ -1958,12 +1983,15 @@
           infoEl.textContent = baseText + " | 后台: 查询失败 (Service Worker 未响应或已重启，请刷新页面)";
           return;
         }
-        var lastUp = stats.lastUpdated ? " | 最后同步: " + new Date(stats.lastUpdated).toLocaleString() : "";
-        infoEl.textContent = baseText + " | 后台: " + stats.performanceCount + " 场 / " + stats.memberCount + " 人" + lastUp;
-        if (stats.performanceCount === 0) {
+        var lastUp = stats.lastUpdated ? " | 同步: " + new Date(stats.lastUpdated).toLocaleTimeString() : "";
+        // [OPT] 显示包含归档数据的完整统计
+        var totalCount = stats.totalPerformanceCount || stats.performanceCount;
+        var archivedInfo = stats.archivedCount > 0 ? " (含归档 " + stats.archivedCount + " 场)" : "";
+        infoEl.textContent = baseText + " | 后台: " + totalCount + " 场 / " + stats.memberCount + " 人" + archivedInfo + lastUp;
+        if (totalCount === 0) {
           infoEl.textContent += " (未建立索引，请先批量索引)";
         }
-        log("后台索引状态: " + stats.performanceCount + " 场公演, " + stats.memberCount + " 位成员" + (stats.indexingState && stats.indexingState.running ? ", [索引进度中]" : ""));
+        log("后台索引状态: " + totalCount + " 场公演, " + stats.memberCount + " 位成员" + (stats.indexingState && stats.indexingState.running ? ", [索引进度中]" : ""));
       });
     }
     updateIndexInfo();
@@ -2202,20 +2230,23 @@
       }
 
       waitBody(function () {
-        setTimeout(function () {
-          try {
-            injectEmbeddedSearch();
-            createFloatPanel();
-            setupVideoShortcuts();
-            createQuickNav();
-            setupReminder();
-            // 公演页：建立成员-公演反向索引
-            indexCurrentPagePerformers();
-            log("所有功能初始化完成");
-          } catch (e) {
-            error("初始化异常:", e);
-          }
-        }, 800);
+        // [OPT] 减少初始化延迟（800→300），使用 requestAnimationFrame 优化首帧渲染
+        requestAnimationFrame(function () {
+          setTimeout(function () {
+            try {
+              injectEmbeddedSearch();
+              createFloatPanel();
+              setupVideoShortcuts();
+              createQuickNav();
+              setupReminder();
+              // 公演页：建立成员-公演反向索引
+              indexCurrentPagePerformers();
+              log("所有功能初始化完成");
+            } catch (e) {
+              error("初始化异常:", e);
+            }
+          }, 300);
+        });
       });
     }
 

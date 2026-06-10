@@ -1,7 +1,11 @@
 // 配置
 const STORAGE_KEY_INDEX = "snh48_full_index";
 const STORAGE_KEY_META = "snh48_index_meta";
-const MAX_INDEX_ITEMS = 2000;
+// [OPT] 索引容量上限：使用 unlimitedStorage 权限，不再限制为 2000
+// 实际上限由 chrome.storage.local 配额决定（unlimitedStorage 下无硬性限制）
+// 设置软上限用于内存保护，超出时触发分片存储而非丢弃数据
+const INDEX_SOFT_LIMIT = 50000; // 软上限：超过此值触发性能优化（分片存储）
+const INDEX_SHARD_SIZE = 5000;  // 每个分片的大小
 
 // 批量抓取状态
 let indexingState = {
@@ -225,6 +229,60 @@ let indexDirty = false;         // 是否有未保存的修改
 let indexFlushTimer = null;
 const INDEX_FLUSH_INTERVAL = 3000; // 3秒批量写入一次
 
+// [OPT] 搜索加速索引：url → performances 数组下标，name → members 数组下标
+let perfUrlMap = new Map();     // url → index in performances[]
+let memberNameMap = new Map();  // name (lowercase) → index in members[]
+// [OPT] 标题倒排索引：title 中的关键词 → Set<performance index>
+let titleKeywordMap = new Map(); // keyword (lowercase) → Set<perfIdx>
+const KEYWORD_MIN_LEN = 2;     // 关键词最短长度
+
+// 重建加速索引（从 indexCache 重建）
+function rebuildAccelIndex() {
+  perfUrlMap.clear();
+  memberNameMap.clear();
+  titleKeywordMap.clear();
+  if (!indexCache || !indexCache.performances) return;
+  indexCache.performances.forEach((p, i) => {
+    if (p.url) perfUrlMap.set(p.url, i);
+    // 构建标题关键词索引
+    if (p.title) {
+      const words = extractKeywords(p.title);
+      words.forEach(w => {
+        if (!titleKeywordMap.has(w)) titleKeywordMap.set(w, new Set());
+        titleKeywordMap.get(w).add(i);
+      });
+    }
+  });
+  if (indexCache.members) {
+    indexCache.members.forEach((m, i) => {
+      if (m.name) memberNameMap.set(m.name.toLowerCase(), i);
+    });
+  }
+}
+
+// 从标题中提取关键词（中文按2-4字分词，英文按空格分词）
+function extractKeywords(title) {
+  const keywords = [];
+  const lower = title.toLowerCase();
+  // 英文词
+  const enWords = lower.match(/[a-z0-9]+/g) || [];
+  enWords.forEach(w => { if (w.length >= KEYWORD_MIN_LEN) keywords.push(w); });
+  // 中文2-gram
+  const cnChars = lower.replace(/[a-z0-9\s]/g, '');
+  if (cnChars.length >= KEYWORD_MIN_LEN) {
+    for (let i = 0; i <= cnChars.length - KEYWORD_MIN_LEN; i++) {
+      keywords.push(cnChars.substring(i, i + KEYWORD_MIN_LEN));
+    }
+  }
+  // 中文3-gram（提升召回率）
+  if (cnChars.length >= 3) {
+    for (let i = 0; i <= cnChars.length - 3; i++) {
+      keywords.push(cnChars.substring(i, i + 3));
+    }
+  }
+  return keywords;
+}
+
 // 加载索引到内存
 async function ensureIndexLoaded() {
   if (indexCacheLoaded) return indexCache;
@@ -232,6 +290,8 @@ async function ensureIndexLoaded() {
     chrome.storage.local.get([STORAGE_KEY_INDEX, STORAGE_KEY_META], (data) => {
       indexCache = data[STORAGE_KEY_INDEX] || { performances: [], members: [] };
       indexCacheLoaded = true;
+      // [OPT] 加载后重建加速索引
+      rebuildAccelIndex();
       resolve(indexCache);
     });
   });
@@ -239,6 +299,7 @@ async function ensureIndexLoaded() {
 
 // 立即 flush 索引到 storage
 // [FIX H4] 使用快照 + writeInProgress 防止数据丢失
+// [OPT] 大数据量时使用 structuredClone 替代 JSON.parse(JSON.stringify) 提升性能
 let writeInProgress = false;
 // [NEW] 异步版 flush，等待写入完成
 function flushIndexNowAsync() {
@@ -256,7 +317,15 @@ function flushIndexNowAsync() {
       return;
     }
     writeInProgress = true;
-    const snapshot = JSON.parse(JSON.stringify(indexCache));
+    // [OPT] 使用 structuredClone 代替 JSON.parse(JSON.stringify)，性能更好
+    let snapshot;
+    try {
+      snapshot = typeof structuredClone === 'function'
+        ? structuredClone(indexCache)
+        : JSON.parse(JSON.stringify(indexCache));
+    } catch (e) {
+      snapshot = JSON.parse(JSON.stringify(indexCache));
+    }
     const toWriteMeta = { lastUpdated: Date.now(), totalItems: snapshot.performances.length + snapshot.members.length };
     indexDirty = false;
     chrome.storage.local.set({
@@ -296,6 +365,7 @@ function generatePerformanceId() {
 }
 
 // 合并到索引（内存修改 + 节流 flush）
+// [OPT] 使用 Map 加速查找，增量更新加速索引
 async function mergeToIndex(performance) {
   await ensureIndexLoaded();
   const index = indexCache;
@@ -306,65 +376,174 @@ async function mergeToIndex(performance) {
   if (!index.performances) index.performances = [];
   if (!index.members) index.members = [];
 
-  // 1. 更新 performances 数组
-  const existingIdx = index.performances.findIndex(p => p.url === performance.url);
-  if (existingIdx >= 0) {
+  // 1. 更新 performances 数组（使用 perfUrlMap 加速查找）
+  const existingIdx = perfUrlMap.has(performance.url) ? perfUrlMap.get(performance.url) : -1;
+  if (existingIdx >= 0 && existingIdx < index.performances.length) {
+    // [OPT] 增量更新：移除旧标题关键词
+    const oldPerf = index.performances[existingIdx];
+    if (oldPerf.title) {
+      extractKeywords(oldPerf.title).forEach(w => {
+        const s = titleKeywordMap.get(w);
+        if (s) s.delete(existingIdx);
+      });
+    }
     index.performances[existingIdx] = { ...index.performances[existingIdx], ...performance };
+    // [OPT] 增量更新：添加新标题关键词
+    if (performance.title) {
+      extractKeywords(performance.title).forEach(w => {
+        if (!titleKeywordMap.has(w)) titleKeywordMap.set(w, new Set());
+        titleKeywordMap.get(w).add(existingIdx);
+      });
+    }
   } else {
+    const newIdx = index.performances.length;
     index.performances.push({
       id: generatePerformanceId(),
       ...performance
     });
+    // [OPT] 增量更新加速索引
+    perfUrlMap.set(performance.url, newIdx);
+    if (performance.title) {
+      extractKeywords(performance.title).forEach(w => {
+        if (!titleKeywordMap.has(w)) titleKeywordMap.set(w, new Set());
+        titleKeywordMap.get(w).add(newIdx);
+      });
+    }
   }
 
-  // 2. 更新 members 反向索引
+  // 2. 更新 members 反向索引（使用 memberNameMap 加速查找）
   (performance.performers || []).forEach(name => {
-    let member = index.members.find(m => m.name === name);
-    if (!member) {
+    const nameLow = name.toLowerCase();
+    const memberIdx = memberNameMap.has(nameLow) ? memberNameMap.get(nameLow) : -1;
+    let member;
+    if (memberIdx >= 0 && memberIdx < index.members.length && index.members[memberIdx].name === name) {
+      member = index.members[memberIdx];
+    } else {
       member = { id: generatePerformanceId(), name, performances: [] };
       index.members.push(member);
+      memberNameMap.set(nameLow, index.members.length - 1);
     }
     if (!member.performances.includes(performance.url)) {
       member.performances.push(performance.url);
     }
   });
 
-  // 3. 容量裁剪
-  if (index.performances.length > MAX_INDEX_ITEMS) {
-    index.performances.sort((a, b) => (b.indexedAt || 0) - (a.indexedAt || 0));
-    index.performances = index.performances.slice(0, MAX_INDEX_ITEMS);
+  // 3. 容量管理（[OPT] 不再裁剪丢弃数据，改为分片存储优化内存）
+  // 超过软上限时，将旧数据归档到分片，内存中只保留最近的数据
+  if (index.performances.length > INDEX_SOFT_LIMIT) {
+    await archiveOldPerformances();
   }
 
   indexDirty = true;
   scheduleFlush();
 }
 
-// [FIX 4.7] 获取当前索引统计（用内存缓存）
+// [OPT] 分片归档：将旧公演数据移到分片存储，释放内存
+// 内存中保留最近 INDEX_SHARD_SIZE 条，旧数据按分片持久化到 storage
+let archivedShardCount = 0; // 已归档的分片数
+
+async function archiveOldPerformances() {
+  const perfs = indexCache.performances;
+  if (perfs.length <= INDEX_SOFT_LIMIT) return;
+
+  // 按时间排序，最新的在前
+  perfs.sort((a, b) => (b.indexedAt || 0) - (a.indexedAt || 0));
+
+  // 需要归档的旧数据
+  const toArchive = perfs.slice(INDEX_SHARD_SIZE);
+  // 保留在内存中的最新数据
+  const toKeep = perfs.slice(0, INDEX_SHARD_SIZE);
+
+  if (toArchive.length === 0) return;
+
+  // 将旧数据按分片写入 storage
+  for (let i = 0; i < toArchive.length; i += INDEX_SHARD_SIZE) {
+    const shard = toArchive.slice(i, i + INDEX_SHARD_SIZE);
+    const shardKey = `snh48_index_shard_${archivedShardCount}`;
+    archivedShardCount++;
+    try {
+      await chrome.storage.local.set({ [shardKey]: shard });
+    } catch (e) {
+      console.warn("[SNH48] 分片归档写入失败:", e);
+      break;
+    }
+  }
+
+  // 更新内存索引
+  indexCache.performances = toKeep;
+  // 重建加速索引
+  rebuildAccelIndex();
+
+  // 更新 meta 记录归档信息
+  const meta = {
+    lastUpdated: Date.now(),
+    totalItems: toKeep.length + toArchive.length,
+    archivedShards: archivedShardCount,
+    inMemoryCount: toKeep.length
+  };
+  await new Promise(resolve => {
+    chrome.storage.local.set({ [STORAGE_KEY_META]: meta }, resolve);
+  });
+}
+
+// [OPT] 从分片加载归档数据用于搜索（按需加载）
+async function loadArchivedShards() {
+  const meta = await new Promise(res => {
+    chrome.storage.local.get(STORAGE_KEY_META, d => res(d[STORAGE_KEY_META] || {}));
+  });
+  const shardCount = meta.archivedShards || 0;
+  const allArchived = [];
+  for (let i = 0; i < shardCount; i++) {
+    const shardKey = `snh48_index_shard_${i}`;
+    const data = await new Promise(res => {
+      chrome.storage.local.get(shardKey, d => res(d[shardKey] || []));
+    });
+    allArchived.push(...data);
+  }
+  return allArchived;
+}
+
+// [FIX 4.7] 获取当前索引统计（用内存缓存 + [OPT] 包含归档数据统计）
 async function getIndexStats() {
   await ensureIndexLoaded();
   const meta = await new Promise(res => {
     chrome.storage.local.get(STORAGE_KEY_META, d => res(d[STORAGE_KEY_META] || {}));
   });
+  const archivedCount = (meta.totalItems || 0) - indexCache.performances.length;
   return {
     performanceCount: indexCache.performances.length,
     memberCount: indexCache.members.length,
+    totalPerformanceCount: meta.totalItems || indexCache.performances.length,
+    archivedCount: Math.max(0, archivedCount),
+    archivedShards: meta.archivedShards || 0,
     lastUpdated: meta.lastUpdated,
     indexingState: indexingState
   };
 }
 
-// [FIX 4.7] 清空索引（同步清缓存 + 写盘 + [M10] 清 club 缓存）
+// [FIX 4.7] 清空索引（同步清缓存 + 写盘 + [M10] 清 club 缓存 + [OPT] 清加速索引和分片）
 async function clearFullIndex() {
   await ensureIndexLoaded();
   indexCache = { performances: [], members: [] };
   indexCacheLoaded = true;
   indexDirty = true;
+  // [OPT] 清空加速索引
+  perfUrlMap.clear();
+  memberNameMap.clear();
+  titleKeywordMap.clear();
   // [M10] 同时清除 id→club 缓存
   idToClubCache = {};
+  // [OPT] 清除所有分片数据
+  archivedShardCount = 0;
+  const allKeys = await new Promise(res => chrome.storage.local.get(null, d => res(Object.keys(d))));
+  const shardKeys = allKeys.filter(k => k.startsWith("snh48_index_shard_"));
+  if (shardKeys.length > 0) {
+    await chrome.storage.local.remove(shardKeys);
+  }
   return new Promise((resolve) => {
     chrome.storage.local.set({
       [STORAGE_KEY_INDEX]: indexCache,
-      [STORAGE_KEY_META]: { lastUpdated: Date.now(), totalItems: 0 }
+      [STORAGE_KEY_META]: { lastUpdated: Date.now(), totalItems: 0, archivedShards: 0, inMemoryCount: 0 }
     }, async () => {
       indexDirty = false;
       // [M10] 持久化清除 club 缓存
@@ -374,7 +553,7 @@ async function clearFullIndex() {
   });
 }
 
-// [FIX 4.7] 搜索索引（用内存缓存）
+// [FIX 4.7] 搜索索引（用内存缓存 + [OPT] 加速索引）
 async function searchIndex(query) {
   await ensureIndexLoaded();
   const q = query.toLowerCase().trim();
@@ -383,33 +562,86 @@ async function searchIndex(query) {
   const results = [];
   const seenUrls = new Set();
 
-  // 路径A: 通过 members 反向索引精确匹配成员名（更快、更准）
-  indexCache.members.forEach(m => {
-    if (!m.name || !m.name.toLowerCase().includes(q)) return;
-    (m.performances || []).forEach(url => {
-      if (seenUrls.has(url)) return;
-      seenUrls.add(url);
-      const perf = indexCache.performances.find(p => p.url === url);
-      if (perf) {
-        results.push({
-          type: "成员参演",
-          typeIcon: "⭐",
-          title: perf.title,
-          url: perf.url,
-          meta: (perf.performers || []).slice(0, 3).join(", ") + ((perf.performers || []).length > 3 ? `...+${perf.performers.length - 3}` : ""),
-          isMemberPerf: true
+  // 路径A: 通过 memberNameMap 精确/模糊匹配成员名（O(1) 精确 + 有限模糊）
+  // [OPT] 先精确查找，再模糊遍历（但用 Map 快速定位）
+  const exactMemberIdx = memberNameMap.get(q);
+  if (exactMemberIdx !== undefined) {
+    const m = indexCache.members[exactMemberIdx];
+    if (m) {
+      (m.performances || []).forEach(url => {
+        if (seenUrls.has(url)) return;
+        seenUrls.add(url);
+        const perfIdx = perfUrlMap.get(url);
+        const perf = perfIdx !== undefined ? indexCache.performances[perfIdx] : null;
+        if (perf) {
+          results.push({
+            type: "成员参演",
+            typeIcon: "⭐",
+            title: perf.title,
+            url: perf.url,
+            meta: (perf.performers || []).slice(0, 3).join(", ") + ((perf.performers || []).length > 3 ? `...+${perf.performers.length - 3}` : ""),
+            isMemberPerf: true
+          });
+        }
+      });
+    }
+  }
+
+  // [OPT] 模糊匹配成员名（遍历 memberNameMap keys，比遍历数组快）
+  if (results.length === 0) {
+    for (const [nameLow, idx] of memberNameMap) {
+      if (nameLow === q) continue; // 已精确匹配
+      if (nameLow.includes(q)) {
+        const m = indexCache.members[idx];
+        if (!m) continue;
+        (m.performances || []).forEach(url => {
+          if (seenUrls.has(url)) return;
+          seenUrls.add(url);
+          const perfIdx = perfUrlMap.get(url);
+          const perf = perfIdx !== undefined ? indexCache.performances[perfIdx] : null;
+          if (perf) {
+            results.push({
+              type: "成员参演",
+              typeIcon: "⭐",
+              title: perf.title,
+              url: perf.url,
+              meta: (perf.performers || []).slice(0, 3).join(", ") + ((perf.performers || []).length > 3 ? `...+${perf.performers.length - 3}` : ""),
+              isMemberPerf: true
+            });
+          }
+        });
+        if (results.length >= 20) break; // 限制模糊匹配结果数
+      }
+    }
+  }
+
+  // 路径B: 通过 titleKeywordMap 倒排索引搜索标题（[OPT] 替代全量遍历）
+  if (results.length === 0) {
+    const queryKeywords = extractKeywords(q);
+    // 统计每个 performance 被多少关键词命中
+    const hitCount = new Map(); // perfIdx → count
+    queryKeywords.forEach(kw => {
+      const idxSet = titleKeywordMap.get(kw);
+      if (idxSet) {
+        idxSet.forEach(idx => {
+          hitCount.set(idx, (hitCount.get(idx) || 0) + 1);
         });
       }
     });
-  });
 
-  // 路径B: 按 title + performers 模糊搜索（兜底）
-  if (results.length === 0) {
-    indexCache.performances.forEach(p => {
-      let match = false;
-      if ((p.title || "").toLowerCase().includes(q)) match = true;
-      if ((p.performers || []).some(n => (n || "").toLowerCase().includes(q))) match = true;
-      if (match) {
+    // 按命中数排序，取前 20
+    const sortedHits = [...hitCount.entries()]
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 20);
+
+    sortedHits.forEach(([idx]) => {
+      const p = indexCache.performances[idx];
+      if (!p || seenUrls.has(p.url)) return;
+      // 验证匹配（防止误命中）
+      const titleMatch = (p.title || "").toLowerCase().includes(q);
+      const performerMatch = (p.performers || []).some(n => (n || "").toLowerCase().includes(q));
+      if (titleMatch || performerMatch) {
+        seenUrls.add(p.url);
         const performers = p.performers || [];
         results.push({
           type: "成员参演",
@@ -421,6 +653,59 @@ async function searchIndex(query) {
         });
       }
     });
+
+    // [OPT] 兜底：如果关键词索引未命中，回退到线性搜索（仅限短查询）
+    if (results.length === 0 && q.length >= 2) {
+      const limit = Math.min(indexCache.performances.length, 500); // 限制搜索范围
+      for (let i = 0; i < limit; i++) {
+        const p = indexCache.performances[i];
+        if (!p || seenUrls.has(p.url)) continue;
+        let match = false;
+        if ((p.title || "").toLowerCase().includes(q)) match = true;
+        if ((p.performers || []).some(n => (n || "").toLowerCase().includes(q))) match = true;
+        if (match) {
+          seenUrls.add(p.url);
+          const performers = p.performers || [];
+          results.push({
+            type: "成员参演",
+            typeIcon: "⭐",
+            title: p.title,
+            url: p.url,
+            meta: performers.slice(0, 3).join(", ") + (performers.length > 3 ? `...+${performers.length - 3}` : ""),
+            isMemberPerf: true
+          });
+          if (results.length >= 20) break;
+        }
+      }
+    }
+  }
+
+  // [OPT] 路径C: 内存搜索无结果时，搜索归档分片数据
+  if (results.length === 0) {
+    try {
+      const archived = await loadArchivedShards();
+      for (const p of archived) {
+        if (seenUrls.has(p.url)) continue;
+        let match = false;
+        if ((p.title || "").toLowerCase().includes(q)) match = true;
+        if ((p.performers || []).some(n => (n || "").toLowerCase().includes(q))) match = true;
+        if (match) {
+          seenUrls.add(p.url);
+          const performers = p.performers || [];
+          results.push({
+            type: "成员参演",
+            typeIcon: "⭐",
+            title: p.title,
+            url: p.url,
+            meta: performers.slice(0, 3).join(", ") + (performers.length > 3 ? `...+${performers.length - 3}` : ""),
+            isMemberPerf: true
+          });
+          if (results.length >= 20) break;
+        }
+      }
+    } catch (e) {
+      console.warn("[SNH48] 搜索归档分片失败:", e);
+    }
   }
 
   return results;
@@ -632,7 +917,7 @@ function startRangeIndex(startId, endId) {
 
   const s = Number(startId), e = Number(endId);
   if (s > e) return { success: false, error: "起始ID必须小于结束ID" };
-  if (e - s > 10000) return { success: false, error: "单次范围不能超过10000" };
+  if (e - s > 50000) return { success: false, error: "单次范围不能超过50000" };
 
   indexingState = {
     running: true,
@@ -650,9 +935,12 @@ function startRangeIndex(startId, endId) {
     phase: "preparing" // [FIX 4.1] preparing / listing / indexing
   };
 
-  // [P1] 开始批量索引前自动清空旧索引（避免脏数据累积）
+  // [P1] 开始批量索引前自动清空旧索引（避免脏数据累积）+ [OPT] 清加速索引
   indexCache.performances = [];
   indexCache.members = [];
+  perfUrlMap.clear();
+  memberNameMap.clear();
+  titleKeywordMap.clear();
   idToClubCache = {};
   indexDirty = true;
   scheduleFlush();
@@ -739,6 +1027,7 @@ async function parsePerformancePageWithStatus(url) {
 }
 
 // [FIX 5.2] 执行批量索引（移除问题重重的 listing 阶段，直接索引）
+// [OPT] 小批量并发抓取 + 优化 flush 策略
 async function runRangeIndex() {
   await loadIdClubCache();
   const start = indexingState.startId;
@@ -748,56 +1037,78 @@ async function runRangeIndex() {
   indexingState.phase = "indexing";
   indexingState.currentId = start - 1; // 首个 ID 前
 
-  for (let id = start; id <= end; id++) {
+  // [OPT] 并发参数
+  const BATCH_SIZE = 3; // 每批并发数（避免过多请求触发反爬）
+  const BATCH_FLUSH_INTERVAL = 30; // 每N个ID强制落盘一次（原50，减小以降低数据丢失风险）
+
+  for (let id = start; id <= end; id += BATCH_SIZE) {
     if (!indexingState.running) break;
-    indexingState.currentId = id;
 
-    // [FIX 5.2] 使用多 club 回退策略
-    const url = buildUrlFromId(id);
-    let result = await parsePerformancePageWithRetry(url);
-
-    // [NEW] 如果默认 URL 返回 not_found，尝试其他 club
-    if (result.status === "not_found" || result.status === "no_data") {
-      const fallback = await tryFetchWithClubFallback(id, 1);
-      result = fallback.result;
+    // [OPT] 小批量并发抓取
+    const batchIds = [];
+    for (let b = 0; b < BATCH_SIZE && (id + b) <= end; b++) {
+      batchIds.push(id + b);
     }
 
-    switch (result.status) {
-      case "ok":
-        await mergeToIndex(result.data);
-        indexingState.success++;
-        indexingState.lastTitle = result.data.title;
-        break;
-      case "not_found":
-        indexingState.notFound = (indexingState.notFound || 0) + 1;
-        indexingState.lastTitle = "[404]";
-        break;
-      case "network_error":
-        indexingState.networkError = (indexingState.networkError || 0) + 1;
-        indexingState.failed++;
-        indexingState.lastTitle = "[网络错误]";
-        break;
-      case "server_error":
-        indexingState.failed++;
-        indexingState.lastTitle = `[${result.httpStatus || "?"}]`;
-        break;
-      case "no_data":
-      case "invalid":
-      default:
-        indexingState.skipped++;
-        indexingState.lastTitle = "";
+    const batchResults = await Promise.all(batchIds.map(async (bid) => {
+      if (!indexingState.running) return { id: bid, result: { status: "skipped" } };
+
+      const url = buildUrlFromId(bid);
+      let result = await parsePerformancePageWithRetry(url);
+
+      // 如果默认 URL 返回 not_found，尝试其他 club
+      if (result.status === "not_found" || result.status === "no_data") {
+        const fallback = await tryFetchWithClubFallback(bid, 1);
+        result = fallback.result;
+      }
+
+      return { id: bid, result };
+    }));
+
+    // 处理批量结果
+    for (const { id: bid, result } of batchResults) {
+      indexingState.currentId = bid;
+
+      switch (result.status) {
+        case "ok":
+          await mergeToIndex(result.data);
+          indexingState.success++;
+          indexingState.lastTitle = result.data.title;
+          break;
+        case "not_found":
+          indexingState.notFound = (indexingState.notFound || 0) + 1;
+          indexingState.lastTitle = "[404]";
+          break;
+        case "network_error":
+          indexingState.networkError = (indexingState.networkError || 0) + 1;
+          indexingState.failed++;
+          indexingState.lastTitle = "[网络错误]";
+          break;
+        case "server_error":
+          indexingState.failed++;
+          indexingState.lastTitle = `[${result.httpStatus || "?"}]`;
+          break;
+        case "no_data":
+        case "invalid":
+        case "skipped":
+        default:
+          indexingState.skipped++;
+          indexingState.lastTitle = "";
+      }
     }
 
     // [FIX 5.2] 每 10 个 ID 广播一次进度（降低通信频率）
-    if ((id - start) % 10 === 0 || id === end) {
+    const lastId = batchIds[batchIds.length - 1];
+    if ((lastId - start) % 10 < BATCH_SIZE || lastId === end) {
       broadcastProgress("INDEXING_PROGRESS", { ...indexingState });
     }
 
     // [FIX H7] 自适应延迟：成功/404 用短延迟，出错用长延迟
-    await delay(result.status === "ok" || result.status === "not_found" || result.status === "no_data" ? 200 : 500);
+    const hasError = batchResults.some(r => r.result.status === "network_error" || r.result.status === "server_error");
+    await delay(hasError ? 500 : 200);
 
-    // [FIX] 每 50 个 ID 强制落盘一次，防止 SW 闲置被终止丢失内存数据
-    if ((id - start) % 50 === 0 && indexDirty) {
+    // [OPT] 每 BATCH_FLUSH_INTERVAL 个 ID 强制落盘一次
+    if ((lastId - start) % BATCH_FLUSH_INTERVAL < BATCH_SIZE && indexDirty) {
       await flushIndexNowAsync();
     }
   }

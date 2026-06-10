@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "SNH48 Live Enhancer",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "description": "优化SNH48 GROUP公演直播网站体验：暗黑模式、视频增强、成员搜索、嵌入搜索入口、公演提醒、快捷导航",
   "icons": {
     "16": "icons/icon16.png",

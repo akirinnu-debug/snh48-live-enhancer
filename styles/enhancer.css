@@ -28,8 +28,9 @@
   color: inherit;
   font-size: 13px;
   outline: none;
-  transition: all 0.2s ease;
+  transition: width 0.2s cubic-bezier(0.4, 0, 0.2, 1), background 0.2s, border-color 0.2s, box-shadow 0.2s;
   font-family: inherit;
+  will-change: width;
 }
 
 .snh48-embedded-search-input::placeholder {
@@ -538,16 +539,6 @@
 
 .snh48-section-title {
   font-size: 10px;
-  color: #8a92b8;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin-bottom: 4px;
-  padding-left: 2px;
-  font-weight: 600;
-}
-
-.snh48-section-title {
-  font-size: 10px;
   color: #839cff;
   text-transform: uppercase;
   letter-spacing: 1px;
@@ -699,7 +690,8 @@
   backdrop-filter: blur(3px);
   -webkit-backdrop-filter: blur(3px);
   border: 1px solid rgba(131, 156, 255, 0.35);
-  transition: opacity 0.3s, transform 0.3s;
+  transition: opacity 0.3s, transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform, opacity;
 }
 
 .snh48-quick-nav.hidden {
@@ -752,10 +744,11 @@
   font-size: 13px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
   border: 1px solid rgba(131, 156, 255, 0.3);
-  transition: transform 0.3s ease;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   pointer-events: none;
   max-width: 80%;
   white-space: nowrap;
+  will-change: transform;
 }
 
 .snh48-toast.show {
@@ -1034,4 +1027,55 @@
 .snh48-indexing-input-wrap input:disabled {
   opacity: 0.4;
   cursor: not-allowed;
+}
+
+/* ===========================================
+   11. 响应式适配
+   =========================================== */
+@media (max-width: 768px) {
+  .snh48-embedded-search-input {
+    width: 180px;
+  }
+  .snh48-embedded-search-input:focus {
+    width: 240px;
+  }
+  .snh48-search-results {
+    min-width: 300px;
+    max-width: calc(100vw - 40px);
+  }
+  .snh48-float-panel {
+    width: 200px;
+    max-width: calc(100vw - 20px);
+    right: 8px;
+  }
+  .snh48-quick-nav {
+    padding: 4px 8px;
+    gap: 2px;
+  }
+  .snh48-nav-item {
+    padding: 4px 8px;
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 480px) {
+  .snh48-embedded-search-input {
+    width: 140px;
+  }
+  .snh48-embedded-search-input:focus {
+    width: 200px;
+  }
+  .snh48-search-results {
+    min-width: 260px;
+    left: -20px;
+  }
+  .snh48-float-panel {
+    width: 180px;
+    right: 4px;
+    top: 60px;
+  }
+  .snh48-reminder-popup {
+    width: calc(100vw - 40px);
+    right: 20px;
+  }
 }

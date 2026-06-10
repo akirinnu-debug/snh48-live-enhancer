@@ -2,6 +2,7 @@
 <html>
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SNH48 Live Enhancer</title>
   <style>
     * {
@@ -11,58 +12,83 @@
     }
 
     body {
-      width: 320px;
-      font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+      width: 340px;
+      min-height: 200px;
+      font-family: "Microsoft YaHei", "PingFang SC", -apple-system, sans-serif;
       background: #0f0f1a;
       color: #e0e0e0;
       font-size: 13px;
+      -webkit-font-smoothing: antialiased;
     }
 
     .header {
       background: linear-gradient(135deg, #839cff 0%, #6c5ce7 100%);
-      padding: 14px 16px;
-      text-align: center;
+      padding: 16px 18px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
     }
 
-    .header h1 {
-      font-size: 15px;
+    .header-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: rgba(255,255,255,0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+
+    .header-text h1 {
+      font-size: 14px;
       color: white;
-      margin-bottom: 3px;
+      margin-bottom: 2px;
+      font-weight: 600;
     }
 
-    .header p {
+    .header-text p {
       font-size: 11px;
       color: rgba(255, 255, 255, 0.7);
     }
 
     .content {
-      padding: 10px 14px;
+      padding: 12px 16px;
     }
 
     .section {
-      margin-bottom: 12px;
+      margin-bottom: 14px;
     }
 
     .section-title {
       font-size: 10px;
       color: #839cff;
       text-transform: uppercase;
-      letter-spacing: 1px;
-      margin-bottom: 6px;
-      font-weight: 600;
+      letter-spacing: 1.2px;
+      margin-bottom: 8px;
+      font-weight: 700;
+      padding-left: 2px;
     }
 
     .switch-row {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 4px 0;
+      padding: 5px 0;
+      border-radius: 6px;
+      transition: background 0.15s;
     }
 
-    .switch-row label {
+    .switch-row:hover {
+      background: rgba(131, 156, 255, 0.04);
+    }
+
+    .switch-row label:first-child {
       color: #ccc;
       font-size: 12px;
       cursor: pointer;
+      flex: 1;
     }
 
     .switch {
@@ -72,6 +98,7 @@
       cursor: pointer;
       display: inline-block;
       vertical-align: middle;
+      flex-shrink: 0;
     }
 
     .switch input {
@@ -87,9 +114,9 @@
       left: 0;
       right: 0;
       bottom: 0;
-      background: #444;
+      background: #3a3a4a;
       border-radius: 20px;
-      transition: 0.3s;
+      transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
       cursor: pointer;
     }
 
@@ -102,7 +129,8 @@
       bottom: 2px;
       background: white;
       border-radius: 50%;
-      transition: 0.3s;
+      transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.3);
     }
 
     .switch input:checked + .slider {
@@ -113,25 +141,58 @@
       transform: translateX(16px);
     }
 
+    .switch input:focus-visible + .slider {
+      outline: 2px solid #839cff;
+      outline-offset: 2px;
+    }
+
     .divider {
       height: 1px;
-      background: rgba(255, 255, 255, 0.08);
-      margin: 8px 0;
+      background: rgba(255, 255, 255, 0.06);
+      margin: 10px 0;
+    }
+
+    .tip {
+      font-size: 10px;
+      color: #777;
+      padding: 6px 10px;
+      background: rgba(131, 156, 255, 0.05);
+      border-left: 2px solid rgba(131, 156, 255, 0.4);
+      border-radius: 0 4px 4px 0;
+      margin-top: 8px;
+      line-height: 1.5;
+    }
+
+    .tip kbd {
+      background: rgba(131, 156, 255, 0.15);
+      border: 1px solid rgba(131, 156, 255, 0.25);
+      border-radius: 3px;
+      padding: 0 4px;
+      font-size: 9px;
+      color: #839cff;
+      font-family: monospace;
     }
 
     .status-bar {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 6px 10px;
-      background: rgba(131, 156, 255, 0.08);
-      border-radius: 6px;
-      margin-top: 8px;
+      padding: 8px 12px;
+      background: rgba(131, 156, 255, 0.06);
+      border-radius: 8px;
+      margin-top: 10px;
+      border: 1px solid rgba(131, 156, 255, 0.1);
+    }
+
+    .status-left {
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
 
     .status-dot {
-      width: 8px;
-      height: 8px;
+      width: 7px;
+      height: 7px;
       border-radius: 50%;
       background: #2ecc71;
       animation: pulse 2s infinite;
@@ -144,32 +205,29 @@
 
     .status-text {
       font-size: 11px;
-      color: #888;
+      color: #777;
     }
 
     .footer {
       text-align: center;
-      padding: 6px;
+      padding: 8px;
       font-size: 10px;
-      color: #555;
+      color: #444;
     }
 
-    .tip {
-      font-size: 10px;
-      color: #888;
-      padding: 4px 8px;
-      background: rgba(131, 156, 255, 0.05);
-      border-left: 2px solid #839cff;
-      border-radius: 3px;
-      margin-top: 6px;
-      line-height: 1.4;
+    @media (max-width: 360px) {
+      body { width: 100%; }
+      .content { padding: 10px 12px; }
     }
   </style>
 </head>
 <body>
   <div class="header">
-    <h1>⚙️ SNH48 Live Enhancer</h1>
-    <p>优化公演直播网站体验</p>
+    <div class="header-icon">⚙️</div>
+    <div class="header-text">
+      <h1>SNH48 Live Enhancer</h1>
+      <p>优化公演直播网站体验</p>
+    </div>
   </div>
 
   <div class="content">
@@ -199,7 +257,9 @@
         <label for="screenshotEnabled">截图功能</label>
         <label class="switch"><input type="checkbox" id="screenshotEnabled"><span class="slider"></span></label>
       </div>
-      <div class="tip">Space 播放 | ←/→ 进度 | F 全屏 | P 画中画 | S 截图</div>
+      <div class="tip">
+        <kbd>Space</kbd> 播放 &nbsp; <kbd>←</kbd><kbd>→</kbd> 进度 &nbsp; <kbd>F</kbd> 全屏 &nbsp; <kbd>P</kbd> 画中画 &nbsp; <kbd>S</kbd> 截图
+      </div>
     </div>
 
     <div class="divider"></div>
@@ -223,19 +283,19 @@
         <label for="reminderEnabled">公演提醒</label>
         <label class="switch"><input type="checkbox" id="reminderEnabled"><span class="slider"></span></label>
       </div>
-      <div class="tip">按 Ctrl+K 快速打开搜索</div>
+      <div class="tip">按 <kbd>Ctrl</kbd>+<kbd>K</kbd> 快速打开搜索</div>
     </div>
 
     <div class="status-bar">
-      <div style="display:flex;align-items:center;gap:6px;">
+      <div class="status-left">
         <div class="status-dot"></div>
         <span class="status-text">插件运行中</span>
       </div>
-      <span class="status-text">v2.0.0</span>
+      <span class="status-text">v2.1.0</span>
     </div>
   </div>
 
-  <div class="footer">SNH48 Live Enhancer © 2026</div>
+  <div class="footer">SNH48 Live Enhancer &copy; 2026</div>
 
   <script src="scripts/popup.js"></script>
 </body>

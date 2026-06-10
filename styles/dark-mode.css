@@ -561,3 +561,263 @@ html.snh48-dark .snh48-nav-item.active {
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4) !important;
   font-weight: 600 !important;
 }
+
+/* ============================================================
+   25. 首页/Footer 区域暗黑修复（v2.2.0 新增）
+   解决 footer 白底、登录链接黑字、分团标题等问题
+   ============================================================ */
+
+/* ---- 25.1 Footer 底部区域（核心修复：HTML内联<style>块的 footer{background:#fff}）---- */
+html.snh48-dark footer {
+  background: var(--snh48-bg-card) !important;
+  background-color: var(--snh48-bg-card) !important;
+  color: var(--snh48-text-dim) !important;
+  border-top-color: var(--snh48-border) !important;
+}
+
+html.snh48-dark footer a {
+  color: var(--snh48-text-dim) !important;
+}
+
+html.snh48-dark footer a:hover {
+  color: var(--snh48-primary) !important;
+}
+
+html.snh48-dark .foottexts,
+html.snh48-dark .foottexts p {
+  color: var(--snh48-text-mute) !important;
+}
+
+/* ---- 25.2 分团选择区域 (.group-wrapper) ---- */
+html.snh48-dark .group-wrapper {
+  background: transparent !important;
+}
+
+html.snh48-dark .group-wrapper p {
+  color: var(--snh48-text) !important;
+}
+
+/* ---- 25.3 登录/注册链接文字颜色（h.css 中 .loginbtn / .register a {color:black}）---- */
+html.snh48-dark .loginbtn,
+html.snh48-dark .register a,
+html.snh48-dark .nikename,
+html.snh48-dark .nikename b,
+html.snh48-dark .signin,
+html.snh48-dark .signin a {
+  color: var(--snh48-text) !important;
+}
+
+html.snh48-dark .loginbtn:hover,
+html.snh48-dark .register a:hover {
+  color: var(--snh48-primary) !important;
+}
+
+/* ---- 25.4 充值按钮区域 ---- */
+html.snh48-dark .recharge-btn {
+  color: var(--snh48-text) !important;
+}
+
+/* ---- 25.5 充值弹框 (.rechargebox) ---- */
+html.snh48-dark .rechargebox {
+  background: var(--snh48-bg-elevated) !important;
+  background-color: var(--snh48-bg-elevated) !important;
+  color: var(--snh48-text) !important;
+  border-color: var(--snh48-border) !important;
+}
+
+html.snh48-dark .rectitle {
+  background: var(--snh48-bg-card) !important;
+  background-color: var(--snh48-bg-card) !important;
+  color: var(--snh48-text) !important;
+}
+
+html.snh48-dark .creditbox {
+  color: var(--snh48-text) !important;
+}
+
+html.snh48-dark .creditbox .item_label {
+  color: var(--snh48-text-dim) !important;
+}
+
+html.snh48-dark .creditbox .item_con {
+  color: var(--snh48-text) !important;
+}
+
+html.snh48-dark .creditbox .item_con_options li {
+  border-color: var(--snh48-border) !important;
+  color: var(--snh48-text) !important;
+}
+
+html.snh48-dark .creditbox .item_con_options li.selected {
+  border-color: var(--snh48-primary) !important;
+}
+
+html.snh48-dark .creditbox .item_con .money .sum {
+  color: var(--snh48-primary) !important;
+}
+
+html.snh48-dark .paymentbtn {
+  background: var(--snh48-primary) !important;
+  background-color: var(--snh48-primary) !important;
+  color: #fff !important;
+}
+
+html.snh48-dark .payment1 {
+  color: var(--snh48-text-dim) !important;
+}
+
+html.snh48-dark .payment a {
+  background: var(--snh48-primary) !important;
+  color: #fff !important;
+}
+
+/* ---- 25.6 宝箱弹框 (.thechestbox) ---- */
+html.snh48-dark .thechestbox {
+  background: var(--snh48-bg-elevated) !important;
+  border-color: var(--snh48-border) !important;
+}
+
+html.snh48-dark .thetext {
+  color: var(--snh48-text) !important;
+}
+
+html.snh48-dark .casebox {
+  background-color: var(--snh48-bg-soft) !important;
+}
+
+/* ---- 25.7 画质提示浮层 (.floatlayer) ---- */
+html.snh48-dark .floatlayer .layer {
+  background: rgba(0, 0, 0, 0.7) !important;
+}
+
+html.snh48-dark .floatlayer .textlayer p {
+  color: var(--snh48-text) !important;
+}
+
+html.snh48-dark .layerbtn {
+  background: var(--snh48-primary) !important;
+  color: #fff !important;
+}
+
+/* ---- 25.8 优惠券/代金券弹框 (.ticket-box) ---- */
+html.snh48-dark .ticket-box {
+  background: var(--snh48-bg-elevated) !important;
+  color: var(--snh48-text) !important;
+}
+
+html.snh48-dark .ticket-box input {
+  background: var(--snh48-bg-input) !important;
+  color: var(--snh48-text) !important;
+  border-color: var(--snh48-border) !important;
+}
+
+html.snh48-dark .btns span {
+  background: var(--snh48-bg-card) !important;
+  color: var(--snh48-text-dim) !important;
+}
+
+html.snh48-dark .btns span.sel {
+  background: var(--snh48-primary) !important;
+  color: #fff !important;
+}
+
+html.snh48-dark .ticket-box li {
+  border-color: var(--snh48-border) !important;
+  color: var(--snh48-text) !important;
+}
+
+html.snh48-dark .ticket-box li.selected {
+  border-color: var(--snh48-primary) !important;
+}
+
+html.snh48-dark .btn-back {
+  background: var(--snh48-primary) !important;
+  color: #fff !important;
+}
+
+/* ---- 25.9 支付遮罩层 (.mask / .mask_box) ---- */
+html.snh48-dark .mask {
+  background: rgba(0, 0, 0, 0.75) !important;
+}
+
+html.snh48-dark .mask_box {
+  background: var(--snh48-bg-elevated) !important;
+  color: var(--snh48-text) !important;
+}
+
+html.snh48-dark .mode_code .m_span,
+html.snh48-dark .mode .m_span {
+  color: var(--snh48-text) !important;
+}
+
+html.snh48-dark .mode_box {
+  background: var(--snh48-bg-input) !important;
+}
+
+html.snh48-dark .code_input {
+  background: var(--snh48-bg-input) !important;
+  color: var(--snh48-text) !important;
+  border-color: var(--snh48-border) !important;
+}
+
+html.snh48-dark .smd {
+  color: var(--snh48-text-dim) !important;
+}
+
+html.snh48-dark .mask-btns .btn1 {
+  background: var(--snh48-primary) !important;
+  color: #fff !important;
+}
+
+html.snh48-dark .mask-btns .btn2 {
+  background: var(--snh48-text-mute) !important;
+  color: #fff !important;
+}
+
+/* ---- 25.10 h.css 原始样式中的硬编码颜色兜底覆盖 ---- */
+/* conter 系列（旧版页面结构，可能残留） */
+html.snh48-dark .conter1 {
+  background: var(--snh48-bg-card) !important;
+  border-bottom-color: var(--snh48-border) !important;
+}
+
+html.snh48-dark .conter2 {
+  background: var(--snh48-bg-content) !important;
+}
+
+html.snh48-dark .conter3 {
+  background: var(--snh48-bg) !important;
+}
+
+html.snh48-dark .conter5 {
+  background: var(--snh48-bg) !important;
+}
+
+html.snh48-dark .conter6 .box {
+  background: var(--snh48-bg-content) !important;
+  border-color: var(--snh48-border) !important;
+}
+
+/* ---- 25.11 index.css 中的白底容器 ---- */
+html.snh48-dark .imglistbox {
+  background: var(--snh48-bg-card) !important;
+}
+
+html.snh48-dark .typesetting {
+  background: var(--snh48-bg-card) !important;
+  border-color: var(--snh48-border) !important;
+  color: var(--snh48-text-dim) !important;
+}
+
+html.snh48-dark .chestgift li {
+  background: var(--snh48-bg-soft) !important;
+}
+
+/* ---- 25.12 通用兜底：所有未覆盖的白色/浅灰背景元素 ---- */
+html.snh48-dark [style*="background: #f9f9f9" i],
+html.snh48-dark [style*="background:#f9f9f9" i],
+html.snh48-dark [style*="background-color: #f9f9f9" i],
+html.snh48-dark [style*="background-color:#f9f9f9" i] {
+  background-color: var(--snh48-bg-card) !important;
+  background: var(--snh48-bg-card) !important;
+}
