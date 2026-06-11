@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "SNH48 Live Enhancer",
-  "version": "2.2.0",
+  "version": "3.0.0",
   "description": "优化SNH48 GROUP公演直播网站体验：暗黑模式、视频增强、成员搜索、嵌入搜索入口、公演提醒、快捷导航",
   "icons": {
     "16": "icons/icon16.png",
@@ -34,7 +34,7 @@
     {
       "matches": ["https://live.48.cn/*"],
       "css": ["styles/dark-mode.css", "styles/enhancer.css"],
-      "js": ["scripts/content.js"],
+      "js": ["scripts/message-types.js", "scripts/config.js", "scripts/utils.js", "scripts/watch-history.js", "scripts/calendar-view.js", "scripts/dark-mode.js", "scripts/member-index.js", "scripts/embedded-search.js", "scripts/video-enhancer.js", "scripts/quick-nav.js", "scripts/reminder.js", "scripts/float-panel.js", "scripts/content.js"],
       "run_at": "document_idle"
     }
   ],

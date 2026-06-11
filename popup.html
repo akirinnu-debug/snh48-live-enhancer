@@ -173,6 +173,37 @@
       font-family: monospace;
     }
 
+    .data-mgmt {
+      margin-top: 10px;
+    }
+
+    .data-mgmt-btns {
+      display: flex;
+      gap: 8px;
+    }
+
+    .data-mgmt-btn {
+      flex: 1;
+      padding: 6px 0;
+      font-size: 11px;
+      color: #ccc;
+      background: rgba(131, 156, 255, 0.08);
+      border: 1px solid rgba(131, 156, 255, 0.2);
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s;
+      text-align: center;
+    }
+
+    .data-mgmt-btn:hover {
+      background: rgba(131, 156, 255, 0.16);
+      border-color: rgba(131, 156, 255, 0.4);
+    }
+
+    .data-mgmt-btn:active {
+      background: rgba(131, 156, 255, 0.24);
+    }
+
     .status-bar {
       display: flex;
       align-items: center;
@@ -286,17 +317,31 @@
       <div class="tip">按 <kbd>Ctrl</kbd>+<kbd>K</kbd> 快速打开搜索</div>
     </div>
 
+    <div class="divider"></div>
+
+    <!-- 数据管理 -->
+    <div class="section data-mgmt">
+      <div class="section-title">数据管理</div>
+      <div class="data-mgmt-btns">
+        <button type="button" class="data-mgmt-btn" id="exportConfigBtn">导出配置</button>
+        <button type="button" class="data-mgmt-btn" id="importConfigBtn">导入配置</button>
+      </div>
+      <input type="file" id="importConfigFile" accept=".json" style="display:none">
+    </div>
+
     <div class="status-bar">
       <div class="status-left">
         <div class="status-dot"></div>
         <span class="status-text">插件运行中</span>
       </div>
-      <span class="status-text">v2.1.0</span>
+      <span class="status-text">v3.0.0</span>
     </div>
   </div>
 
   <div class="footer">SNH48 Live Enhancer &copy; 2026</div>
 
+  <script src="scripts/message-types.js"></script>
+  <script src="scripts/config.js"></script>
   <script src="scripts/popup.js"></script>
 </body>
 </html>

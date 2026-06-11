@@ -1,5 +1,22 @@
 /* ========== SNH48 Live Enhancer - UI Enhancement v2 ========== */
 
+/* ===== CSS 变量定义（确保日历/弹窗/Toast 始终有不透明背景和可读文字）===== */
+:root {
+  --snh48-bg-panel: #ffffff;
+  --snh48-text: #333333;
+  --snh48-text-dim: #888888;
+  --snh48-accent: #839cff;
+  --snh48-border: rgba(0, 0, 0, 0.08);
+}
+html.snh48-dark {
+  --snh48-bg-panel: #1a1a2e;
+  --snh48-text: #e0e0e8;
+  --snh48-text-dim: #9090a8;
+  --snh48-accent: #839cff;
+  --snh48-border: rgba(255, 255, 255, 0.08);
+}
+
+/* ===== 搜索框 ===== */
 /* ===========================================
    1. 嵌入网页顶部的搜索入口
    =========================================== */
@@ -171,6 +188,8 @@
   text-transform: uppercase;
   letter-spacing: 0.5px;
   font-weight: 600;
+  cursor: pointer;
+  user-select: none;
 }
 
 .snh48-search-group-icon {
@@ -188,6 +207,28 @@
   border-radius: 8px;
   font-size: 9px;
   font-weight: bold;
+}
+
+.snh48-search-group-header::after {
+  content: "▾";
+  font-size: 10px;
+  color: #839cff;
+  margin-left: 4px;
+  transition: transform 0.15s;
+}
+
+.snh48-search-group-collapsed .snh48-search-group-header::after {
+  transform: rotate(-90deg);
+}
+
+.snh48-search-group-collapsed .snh48-search-result-item,
+.snh48-search-group-collapsed .snh48-search-more {
+  display: none;
+}
+
+.snh48-search-group-header.active {
+  background: rgba(131, 156, 255, 0.12);
+  border-radius: 4px;
 }
 
 /* 单条结果 */
@@ -370,6 +411,7 @@
   border-radius: 10px;
 }
 
+/* ===== 浮动面板 ===== */
 /* ===========================================
    3. 浮动控制面板（紧凑、可拖动）
    =========================================== */
@@ -663,6 +705,39 @@
   text-align: center;
 }
 
+.snh48-shortcut-settings-list {
+  padding: 4px 0;
+}
+.snh48-shortcut-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 3px 0;
+}
+.snh48-shortcut-label {
+  font-size: 12px;
+  color: var(--snh48-text);
+}
+.snh48-shortcut-input {
+  width: 80px;
+  padding: 2px 6px;
+  font-size: 11px;
+  text-align: center;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 3px;
+  color: var(--snh48-text);
+  cursor: pointer;
+}
+.snh48-shortcut-input:focus {
+  border-color: var(--snh48-accent);
+  outline: none;
+}
+.snh48-shortcut-listening {
+  color: var(--snh48-accent);
+  font-style: italic;
+}
+
 .snh48-panel-footer {
   text-align: center;
   padding: 6px 0;
@@ -672,6 +747,7 @@
   margin-top: 4px;
 }
 
+/* ===== 快捷导航 ===== */
 /* ===========================================
    4. 快捷导航
    =========================================== */
@@ -728,6 +804,7 @@
   font-weight: 600;
 }
 
+/* ===== Toast 通知 ===== */
 /* ===========================================
    5. Toast 通知
    =========================================== */
@@ -751,8 +828,12 @@
   will-change: transform;
 }
 
-.snh48-toast.show {
+.snh48-toast.snh48-toast-show {
   transform: translateX(-50%) translateY(0);
+}
+
+.snh48-toast.snh48-toast-hide {
+  transform: translateX(-50%) translateY(-60px);
 }
 
 /* ===========================================
@@ -879,6 +960,29 @@
   transform: scale(0.95);
 }
 
+/* ===== 数据管理 ===== */
+/* 数据管理按钮区域 */
+.snh48-data-mgmt-btns {
+  display: flex;
+  gap: 6px;
+  margin: 4px 0 6px 0;
+}
+
+.snh48-data-mgmt-btns .snh48-mini-btn {
+  background: rgba(131, 156, 255, 0.12);
+  color: #839cff;
+  border: 1px solid rgba(131, 156, 255, 0.3);
+}
+
+.snh48-data-mgmt-btns .snh48-mini-btn:hover {
+  background: rgba(131, 156, 255, 0.25);
+  color: #fff;
+}
+
+.snh48-data-mgmt-btns .snh48-mini-btn:active {
+  transform: scale(0.95);
+}
+
 /* "成员参演"搜索结果类型 - 特殊颜色突出 */
 .snh48-search-result-item .snh48-search-type.snh48-type-member-perf {
   background: rgba(155, 89, 182, 0.25) !important;
@@ -899,6 +1003,7 @@
   50% { opacity: 0.6; }
 }
 
+/* ===== 批量索引 ===== */
 /* ===========================================
    10. 批量索引样式
    =========================================== */
@@ -1029,8 +1134,95 @@
   cursor: not-allowed;
 }
 
+/* 索引模式选择器 */
+.snh48-indexing-mode-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+
+.snh48-indexing-mode-label {
+  font-size: 11px;
+  color: #aaa;
+  flex-shrink: 0;
+}
+
+.snh48-indexing-mode-select {
+  flex: 1;
+  height: 24px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(131,156,255,0.25);
+  border-radius: 4px;
+  color: #e0e0e0;
+  padding: 0 6px;
+  font-size: 11px;
+  outline: none;
+  font-family: inherit;
+  cursor: pointer;
+  appearance: auto;
+}
+
+.snh48-indexing-mode-select:focus {
+  border-color: #839cff;
+}
+
+.snh48-indexing-mode-select:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
 /* ===========================================
-   11. 响应式适配
+   11. 观看历史
+   =========================================== */
+.snh48-watched-badge {
+  display: inline-block;
+  font-size: 10px;
+  color: #4caf50;
+  background: rgba(76, 175, 80, 0.1);
+  padding: 1px 4px;
+  border-radius: 3px;
+  margin-left: 4px;
+  vertical-align: middle;
+}
+.snh48-recent-list {
+  max-height: 150px;
+  overflow-y: auto;
+}
+.snh48-recent-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 4px 0;
+  color: var(--snh48-text);
+  text-decoration: none;
+  font-size: 12px;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+.snh48-recent-item:hover {
+  color: var(--snh48-accent);
+}
+.snh48-recent-title {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin-right: 8px;
+}
+.snh48-recent-time {
+  font-size: 10px;
+  color: var(--snh48-text-dim);
+  white-space: nowrap;
+}
+.snh48-empty-tip {
+  font-size: 12px;
+  color: var(--snh48-text-dim);
+  text-align: center;
+  padding: 8px;
+}
+
+/* ===========================================
+   12. 响应式适配
    =========================================== */
 @media (max-width: 768px) {
   .snh48-embedded-search-input {
@@ -1078,4 +1270,232 @@
     width: calc(100vw - 40px);
     right: 20px;
   }
+}
+
+/* ===== 日历视图 ===== */
+.snh48-calendar-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.6);
+  z-index: 100000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.snh48-calendar-container {
+  background: var(--snh48-bg-panel, #1a1a2e);
+  border-radius: 12px;
+  padding: 20px;
+  width: 420px;
+  max-height: 80vh;
+  overflow-y: auto;
+  color: var(--snh48-text, #e0e0e8);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+  border: 1px solid var(--snh48-border, rgba(255,255,255,0.1));
+}
+.snh48-calendar-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.snh48-calendar-nav-btn {
+  background: rgba(255,255,255,0.1);
+  border: none;
+  color: var(--snh48-text);
+  padding: 4px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+}
+.snh48-calendar-nav-btn:hover {
+  background: rgba(255,255,255,0.2);
+}
+.snh48-calendar-title {
+  flex: 1;
+  text-align: center;
+  font-size: 16px;
+  font-weight: bold;
+}
+.snh48-calendar-close-btn {
+  background: none;
+  border: none;
+  color: var(--snh48-text-dim);
+  cursor: pointer;
+  font-size: 16px;
+  padding: 4px 8px;
+}
+.snh48-calendar-close-btn:hover {
+  color: var(--snh48-text);
+}
+.snh48-calendar-filter {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+.snh48-calendar-filter-btn {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: var(--snh48-text);
+  padding: 2px 8px;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 11px;
+}
+.snh48-calendar-filter-btn.active {
+  background: var(--snh48-accent);
+  color: #fff;
+  border-color: var(--snh48-accent);
+}
+.snh48-calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+}
+.snh48-calendar-day-header {
+  text-align: center;
+  font-size: 11px;
+  color: var(--snh48-text-dim);
+  padding: 4px 0;
+}
+.snh48-calendar-day {
+  text-align: center;
+  padding: 6px 2px;
+  border-radius: 4px;
+  font-size: 12px;
+  position: relative;
+  min-height: 32px;
+  color: var(--snh48-text, #e0e0e8);
+}
+.snh48-calendar-day.empty {
+  background: transparent;
+  color: transparent;
+}
+.snh48-calendar-day.today {
+  background: rgba(255,255,255,0.15);
+  font-weight: bold;
+  color: var(--snh48-accent, #839cff);
+}
+.snh48-calendar-day.has-perf {
+  cursor: pointer;
+  background: rgba(255,107,53,0.18);
+  color: var(--snh48-text, #e0e0e8);
+  font-weight: bold;
+}
+.snh48-calendar-day.has-perf:hover {
+  background: rgba(255,107,53,0.35);
+}
+.snh48-calendar-day-num {
+  display: block;
+  color: inherit;
+}
+.snh48-calendar-dot {
+  position: absolute;
+  bottom: 2px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 9px;
+  color: var(--snh48-accent, #839cff);
+  background: rgba(255,107,53,0.2);
+  padding: 0 3px;
+  border-radius: 3px;
+  font-weight: bold;
+}
+.snh48-calendar-detail {
+  margin-top: 12px;
+  border-top: 1px solid rgba(255,255,255,0.1);
+  padding-top: 12px;
+}
+.snh48-calendar-detail-title {
+  font-size: 14px;
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+.snh48-calendar-detail-item {
+  display: block;
+  padding: 6px 8px;
+  color: var(--snh48-text);
+  text-decoration: none;
+  border-radius: 4px;
+  margin-bottom: 4px;
+  background: rgba(255,255,255,0.03);
+}
+.snh48-calendar-detail-item:hover {
+  background: rgba(255,255,255,0.08);
+  color: var(--snh48-accent);
+}
+.snh48-calendar-detail-name {
+  display: block;
+  font-size: 13px;
+}
+.snh48-calendar-detail-meta {
+  display: block;
+  font-size: 11px;
+  color: var(--snh48-text-dim);
+  margin-top: 2px;
+}
+.snh48-calendar-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 2px 6px;
+  border-radius: 3px;
+}
+.snh48-calendar-btn:hover {
+  background: rgba(255,255,255,0.1);
+}
+
+/* ===== 确认对话框 ===== */
+.snh48-confirm-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 100001;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.snh48-confirm-dialog {
+  background: var(--snh48-bg-panel, #1a1a2e);
+  border-radius: 8px;
+  padding: 20px;
+  min-width: 280px;
+  max-width: 400px;
+  color: var(--snh48-text, #e0e0e8);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+  border: 1px solid var(--snh48-border, rgba(255,255,255,0.1));
+}
+.snh48-confirm-message {
+  font-size: 14px;
+  line-height: 1.5;
+  margin-bottom: 16px;
+  color: var(--snh48-text, #e0e0e8);
+}
+.snh48-confirm-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+.snh48-confirm-btn {
+  padding: 6px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+}
+.snh48-confirm-cancel {
+  background: rgba(255,255,255,0.1);
+  color: var(--snh48-text);
+}
+.snh48-confirm-cancel:hover {
+  background: rgba(255,255,255,0.2);
+}
+.snh48-confirm-ok {
+  background: #e53935;
+  color: #fff;
+}
+.snh48-confirm-ok:hover {
+  background: #c62828;
 }
